@@ -1,0 +1,137 @@
+<!-- Pick Up & Delivery Form -->
+<div [@cartpickupdeliveryform] *ngIf="visible">
+    <h5>2. Enter Fullfilment Details</h5>
+    <form>
+        <div class="row">
+            <div class="col-xl-5">
+                <label for="firstNameDelivery"><b>Select items to be delivered</b></label><br>
+                <div class="form-check form-check-inline round">
+                    <input class="form-check-input" type="checkbox" name="deliveryChk1" id="deliveryChk1" value="deliveryChk1">
+                    <label for="deliveryChk1"></label>
+                    <img class="border mr-3" width="30%" src="assets/images/product-2.png">
+                    <span>000161</span>
+                </div><br><br>
+                <div class="form-check form-check-inline round">
+                    <input class="form-check-input" type="checkbox" name="deliveryChk2" id="deliveryChk2" value="deliveryChk2">
+                    <label for="deliveryChk2"></label>
+                    <img class="border mr-3" width="30%" src="assets/images/product-2.png">
+                    <span>000161</span>
+                </div>
+            </div>
+            <div class="col-xl-7">
+                <div class="row sm-gutters">
+                    <div class="col-xl-6 form-group">
+                        <label for="firstNameDelivery">First Name</label>
+                        <input type="text" class="form-control" id="firstNameDelivery">
+                    </div>
+                    <div class="col-xl-6 form-group">
+                        <label for="lastNameDelivery">Last Name</label>
+                        <input type="text" class="form-control" id="lastNameDelivery">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="companyDelivery">Company</label>
+                    <input type="text" class="form-control" id="companyDelivery">
+                </div>
+                <div class="form-group">
+                    <label for="deliveryAddressLine1Delivery">Delivery Address Line 1</label>
+                    <input type="text" class="form-control" id="deliveryAddressLine1Delivery">
+                </div>
+                <div class="form-group">
+                    <label for="deliveryAddressLine2Delivery">Delivery Address Line 2</label>
+                    <input type="text" class="form-control" id="deliveryAddressLine2Delivery">
+                </div>
+                <div class="row sm-gutters">
+                    <div class="col-xl-6 form-group">
+                        <label for="stateDelivery">State</label>
+                        <input type="text" class="form-control" id="stateDelivery">
+                    </div>
+                    <div class="col-xl-6 form-group">
+                        <label for="postalCodeDelivery">Postal Code</label>
+                        <input type="text" class="form-control" id="postalCodeDelivery">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="mobileDelivery">Mobile</label>
+                    <input type="text" class="form-control" id="mobileDelivery">
+                </div>
+                <div class="form-group">
+                    <label for="emailDelivery">Email</label>
+                    <input type="email" class="form-control" id="emailDelivery">
+                </div>
+            </div>
+        </div>
+    <h5>3. Enter Pickup Details</h5>
+    <div class="row">
+        <div class="col-xl-5">
+            <label for="firstNameDelivery"><b>Select items to be picked up</b></label><br>
+            <div class="form-check form-check-inline round">
+                <input class="form-check-input" type="checkbox" name="pickupChk1" id="pickupChk1" value="pickupChk1">
+                <label for="pickupChk1"></label>
+                <img class="border mr-3" width="30%" src="assets/images/product-2.png">
+                <span>000161</span>
+            </div><br><br>
+            <div class="form-check form-check-inline round">
+                <input class="form-check-input" type="checkbox" name="pickupChk2" id="pickupChk2" value="pickupChk2">
+                <label for="pickupChk2"></label>
+                <img class="border mr-3" width="30%" src="assets/images/product-2.png">
+                <span>000161</span>
+            </div>
+        </div>
+        <div class="col-xl-7">
+            <div class="row sm-gutters">
+                <div class="col-xl-6 form-group">
+                    <label for="firstNamePickup">First Name</label>
+                    <input type="text" class="form-control" id="firstNamePickup">
+                </div>
+                <div class="col-xl-6 form-group">
+                    <label for="lastNamePickup">Last Name</label>
+                    <input type="text" class="form-control" id="lastNamePickup">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mobilePickup">Mobile</label>
+                <input type="text" class="form-control" id="mobilePickup">
+            </div>
+            <div class="form-group">
+                <label for="locationPickup">Pick-up Location</label>
+                <select class="form-control" id="locationPickup">
+                    <option>Location</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <span for="addressPickup"><b>Address: </b>91 Stubbs St. Kensington VIC 3031</span><br>
+                <span for="contactNumberPickup"><b>Contact Number: </b>1300363935</span>
+            </div>
+            <div class="row sm-gutters">
+                <div class="col-xl-6 form-group">
+                    <label for="datePickup">Pick-up Date & Time</label>
+                    <select class="form-control" id="datePickup">
+                        <option>Date</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+                <div class="col-xl-6 form-group">
+                    <label for="timePickup">&nbsp;</label>
+                    <select class="form-control" id="timePickup">
+                        <option>Time</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Confirm</button>
+        </div>
+    </div>
+    </form><br>
+</div>
+<!-- Pick Up & Delivery Form -->

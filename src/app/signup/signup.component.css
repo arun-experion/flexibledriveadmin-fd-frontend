@@ -1,0 +1,12 @@
+.btn-primary.loginSignUp, 
+.btn-primary.loginSignUp:hover,
+.btn-primary.loginSignUp:active,
+.btn-primary.loginSignUp:focus{
+    background-color: #ffffff;
+    border-color: #ef5324;
+    color: #ef5324;
+}
+
+.forgotPassword{ 
+    color: #ef5324;
+}

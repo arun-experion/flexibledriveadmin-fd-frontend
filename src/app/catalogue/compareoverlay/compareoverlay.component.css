@@ -1,0 +1,7 @@
+.popup-section.compare-popup-section {
+    display: block;
+}
+
+.compare-list li .media img{
+    height: 50px;
+}

@@ -1,0 +1,73 @@
+<app-header></app-header>
+<main>
+    <section class="advance-search-form">
+        <div class="container py-5">
+			<form [formGroup]="quickOrderForm" (ngSubmit)="onQuickOrderFormSubmit()">
+			<div class="d-none d-md-block">
+				<table class="table partsTable">
+					<thead>
+						<tr>
+							<th class="border-top-0" style="width:40%;">Quick order</th>
+							<th class="border-top-0"></th>
+							<th class="border-top-0">Criteria Notes</th>
+							<th class="border-top-0">Fitting position</th>
+							<th class="border-top-0">Price</th>
+							<th class="border-top-0" style="width:20%;">Availability</th>
+						</tr>
+					</thead>
+					<tbody formArrayName="products">
+						<tr *ngFor="let itemrow of quickOrderForm.controls.products['controls']; let i=index"  [formGroupName]="i">
+							<td>
+								<div class="row row m-0">
+									<input type="hidden" class="form-control" #product_id name="product_id[]" id="product_id{{i}}" formControlName="product_id" value="">
+									<div style="width: 41%;margin-right: 5px;">
+										<!--<input type="text" class="form-control part-number" placeholder="Enter part number" name="partNumber[]" formControlName="partNumber" #partNumber id="partNumber{{i}}" (blur)="onProductNo(i)"> -->
+										<input type="text" class="form-control part-number" placeholder="Enter part number" name="partNumber[]" formControlName="partNumber" #partNumber id="partNumber{{i}}"  (focusout)="checkOutProductNo($event.target.value,1,i);" (blur)="onProductNo(i)"> 
+
+									</div>
+									<div style="width: 19%;margin-right: 5px;">
+										<input type="number" #qty class="form-control qty" [disabled]="isValid!=i" id="qty{{i}}" placeholder="Qty" name="qty[]" formControlName="qty" min="1" (focusout)="checkOutProductNo(partNumber.value,$event.target.value,i)">
+									</div>
+									<div>
+										<button type="button" class="btn btn-primary searchbutton" [disabled]="isValid==i" title="Check Item" (click)="onCheckProduct(partNumber.value,qty.value,i)"><i class="fa fa-search"></i> </button>&nbsp;
+										<button type="button" class="btn btn-danger searchbutton" *ngIf="formArr.controls.length > 1" title="Remove Item" (click)="removeProductListItems(i,partNumber.value)"><i class="fa fa-trash" aria-hidden="true"></i></button>
+									</div>
+								</div>
+							</td>						
+							<td id="productName{{i}}"></td>
+							<td id="criteriaNotes{{i}}"></td>
+							<td id="fittingPosition{{i}}"></td>
+							<td id="price{{i}}"></td>
+							<td id="availability{{i}}">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div> 
+			<div class="d-none d-md-block">		
+				<a href="javascript:void(0);" (click)="addNewRow()"><i class="fa fa-plus-circle"></i> Add More</a>
+			</div> 
+			<div class="d-none d-md-block text-center">		
+				<button type="submit" class="btn btn-primary" [disabled]="isValidOrder==null">Place Order </button>
+			</div> 
+			</form>
+        </div>
+	</section>
+	<ng-template #searchProductNotFound let-c="close" let-d="dismiss">
+		<div class="modal-header border-0 pb-0">
+			<button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body col-sm-8 col-12 text-center mx-auto">
+			<p class="my-5">Part number(s) [ <a href="#" class="text-primary">{{message}} </a>]  cannot be found. Click 'Back to Order' to check
+				if you have the right part number or 'Continue' to order the rest of your parts.
+				Any issues, get in touch with us on <a href="tel:+1300363935" class="text-primary">1300 363 735</a>
+			</p>
+			<!-- <button type="submit" class="btn btn-sm btn-primary mb-3 col-9" data-dismiss="modal">Save</button> -->
+			<button type="button" class="btn btn-sm btn-primary mb-3 mb-3 col-9" (click)="c('OK');removeArray()">Back To Order</button>
+			<button type="button" class="btn btn-sm btn-primary mb-3 mb-3 col-9" (click)="placeOrde()" *ngIf="productData.length >= 1">Continue</button>
+		</div>
+	</ng-template>
+</main>
+<app-footer></app-footer>

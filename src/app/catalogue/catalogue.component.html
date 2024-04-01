@@ -1,0 +1,371 @@
+<app-header></app-header>
+<main>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-3">
+        <div class="sidebar">
+          <h3 class="text-secondary mb-4">Refine</h3>
+          <div class="row">
+            <div class="col-6">
+              <button id="filter-nav-toggle" class="btn btn-outline-secondary w-100 filter-nav-toggle"
+                type="button">Filter by</button>
+            </div>
+            <div class="col-6">
+              <button id="sorting-nav-toggle" class="btn btn-outline-secondary w-100 sorting-nav-toggle"
+                type="button">Sort by</button>
+            </div>
+          </div>
+          <div class="filter-sidebar">
+            <div class="widget border-0">
+              <a class="btn btn-primary d-block" [routerLink]="['/dashboard']">New Search</a>
+            </div>
+            <div class="widget border-0">
+              <a style="cursor: pointer;" class="btn btn-primary bg-light d-block" (click)="getAllProducts()">Clear
+                Filter</a>
+            </div>
+            <div class="widget">
+              <div class="btn-toogle" data-toggle="collapse" data-target="#collapseCategory">Category<i
+                  class="flaticon-down-arrow"></i></div>
+              <div class="collapse show" id="collapseCategory">
+                <div class="collapse-body">
+                  <div class="scroll-container mCustomScrollbar overflow-auto" data-mcs-theme="dark">
+                    <ul class="list-unstyled">
+                      <li *ngFor="let category of filters(categoryData)">
+                        <a [ngClass]="{'text-primary': categoryId === category.id}" style="cursor: pointer"
+                          (click)="getAllProducts(0,category.id);">
+                          {{category.name}} ({{category.product_count}})
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="widget">
+              <div class="btn-toogle" data-toggle="collapse" data-target="#collapseCategory">Fitting position<i
+                  class="flaticon-down-arrow"></i></div>
+              <div class="collapse show" id="collapseCategory">
+                <div class="collapse-body">
+                  <div class="scroll-container mCustomScrollbar overflow-auto" data-mcs-theme="dark">
+                    <ul class="list-unstyled">
+                      <li *ngFor="let position of filters(positionData)">
+                        <a style="cursor: pointer" (click)="filterPosition(position.fitting_position)">
+                          {{position.fitting_position}} ({{position.product_count}})
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="widget">
+              <div class="btn-toogle" data-toggle="collapse" data-target="#collapsePricing">Pricing<i
+                  class="flaticon-down-arrow"></i></div>
+              <div class="collapse show" id="collapsePricing">
+                <div class="collapse-body">
+                  <div id="price-range-slider"></div>
+                </div>
+              </div>
+
+            </div>
+            <div class="widget">
+              <div class="btn-toogle" data-toggle="collapse" data-target="#collapseDelivery">Delivery<i
+                  class="flaticon-down-arrow"></i></div>
+              <div class="collapse show" id="collapseDelivery">
+                <div class="collapse-body">
+                  <ul class="list-unstyled">
+                    <li><a class="active">Today (1)</a></li>
+                    <li><a>Tomorrow (1)</a></li>
+                    <li><a>Approx. 2 Weeks (2)</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div> -->
+
+            <div class="widget">
+              <div class="btn-toogle" data-toggle="collapse" data-target="#collapseBrands">Brands<i
+                  class="flaticon-down-arrow"></i></div>
+              <div class="collapse show" id="collapseBrands">
+                <div class="collapse-body">
+                  <ul class="list-unstyled">
+                    <li *ngFor="let brand of filters(brandData);"><a [ngClass]="{'text-primary': brandId === brand.id}"
+                        style="cursor: pointer" (click)="getAllProducts(brand.id);">{{brand.name}}
+                        ({{brand.product_count}})</a></li>
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <div class="sorting-block py-3 my-3">
+          <div class="row align-items-end">
+            <div class="col-md-6">
+              <div class="price-sorting">
+                <form class="price-ordering" method="get">
+                  <label>Sort by</label>
+                  <select name="orderby" class="form-control">
+                    <option value="date">Newest</option>
+                    <option value="price" selected="selected">Price (Low to High)</option>
+                    <option value="price-desc">Price (High to Low)</option>
+                  </select>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="product-list-container">
+
+          <!--===========================================
+                    =            Desktop & Tablet View            =
+                    ============================================-->
+
+          <table class="table partsTable" *ngIf="(productData && productData.length > 0) || !isProductLoading">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="2">Part Number(s) & Name</th>
+                    <th scope="col">Criteria Notes</th>
+                    <th scope="col">Fitting position</th>
+                    <th scope="col" *ngIf="isPriceVisible == true">Price</th>
+                    <th scope="col">Availability</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let part of productData, let counter = index">
+			  <ng-template #content let-modal>
+				  <div class="modal-body catalogue-v-l">
+					<p (click)="modal.dismiss('Cross click')" class="mb-0 text-muted cur-pointer" style="float: right; margin-top: -10px;">X</p>
+					<div class="overflow-auto mb-3 pr-3" style="max-height: 180px;">
+						<table class="table vehicleTable">
+							<thead>
+								<tr>
+									<th scope="col" style="text-align: center;">Vehicle name</th>
+									<th scope="col" align="center" style="text-align: center;">Vehicle model</th>
+									<th scope="col" align="center" style="text-align: center;">Year range</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let vehicl of part.vehicles; let i = index">
+									<td align="center">{{vehicl.make.name}}</td>
+									<td align="center">{{vehicl.model.name}}</td>
+									<td align="center">{{vehicl.year_range}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+				  </div>
+			  </ng-template>
+                  <td>
+                      <div class="row">
+                          <a href="/productdetails/{{part.id}}" class="col d-flex align-items-start" style="min-height: 50px;">
+                              <img *ngIf="part.images.length != 0" src="{{part.images[0].image_url}}" alt=""
+                                  class="p-0 mr-2 border" style="max-height: 70px;">
+
+                              <img *ngIf="part.images && part.images.length == 0" src="assets/images/footer-logo.png"
+                                  alt="" class="footerLogPlaceHolder p-0 mr-3 border" style="height: 50px;">
+
+                                  <!-- <div>
+                                    <div class="font-weight-bold">{{part.company_sku}}</div>
+                                    <div *ngIf="part.cross_reference_numbers != ''">or</div>
+                                    <div *ngIf="part.cross_reference_numbers != ''">{{part.cross_reference_numbers}}
+                                    </div>
+                                  </div> -->
+                              <!-- <img src="assets/images/footer-logo.png"                                   alt="" class="footerLogPlaceHolder p-0 mr-3 border">  -->
+                              
+                          </a>
+						  <a (click)="open(content)" class="cur-pointer col d-flex align-items-start" style="height: 30px;">
+							<img src="assets/images/car_icon_or.png" alt="" class="p-0 mr-3 border"  style="height: 30px;">
+                          </a>
+                      </div>
+                      <div class="row mt-2">
+                          <div class="col-12 font-weight-bold">{{part.company_sku}}</div>
+                          <div *ngIf="part.cross_reference_numbers != ''">or</div>
+                          <div *ngIf="part.cross_reference_numbers != ''">{{part.cross_reference_numbers}}
+                          </div>
+                      </div>
+                      <!-- <div class="font-weight-bold">{{part.brand.name}}</div>
+                      <div>{{part.description}}</div> -->
+                  </td>
+                  <td>
+                      <div class="font-weight-bold">{{part.brand.name}}</div>
+                      <div>{{part.description}}</div>
+                  </td>
+                  <td>
+                      <div *ngFor="let criteria of part.criteria">{{criteria.criteria_name}} : {{criteria.criteria_value}}</div>
+                  </td>
+                  <!-- <td>
+                      <div>{{part?.vehicles[0]?.make?.name}}</div>
+                      <div>{{part?.vehicles[0]?.model?.name}} {{part?.vehicles[0]?.year_range}}</div>
+                      <div *ngIf="part.vehicles.length > 1">...</div>
+                  </td> -->
+                  <td>{{part.fitting_position}} </td>
+                  <td *ngIf="isPriceVisible == true">
+                      <div>
+                          <div class="font-weight-bold">
+                              Nett: {{part.price_nett | currency: 'USD': 'symbol': '1.2-2'}}
+                          </div>
+                          <div style="color: #6c757d !important;">
+                              Retail: {{part.price_retail | currency: 'USD': 'symbol': '1.2-2'}}
+                          </div>
+                      </div>
+                  </td>
+                  <td>
+                      <div class="body-col delivered-body-col">
+                          <ul class="list-unstyled">
+                              <li class="text-success" *ngIf="part.qty !== 0">
+                                  {{part.qty}} items
+                              </li>
+                              <li *ngFor="let qtyState of part.quantityCurrentUserState">
+                                {{qtyState['state']}} : {{qtyState['qty']}}
+                              </li>
+                              <li *ngIf="part.qty != 0">
+                                Interstate : {{part.qty - part.currentUserStateQty}}                                
+                              </li>
+                              <li class="text-danger" *ngIf="part.qty === 0">
+                                  Back order
+                              </li>
+                          </ul>
+                      </div>
+                  </td>
+                  <td>
+                      <div class="body-col compare-body-col">
+                          <div class="compare-block">
+                              <div class="custom-control custom-checkbox compare-checkbox"
+                                  (click)="onCompareChange(part)">
+                                  <input type="checkbox" attr="product" id="compare_{{part.id}}"
+                                      class="custom-control-input" value="1"
+                                      [checked]="part.is_compare == 0 ? false : true">
+                                  <label class="custom-control-label" for="compare1_{{part.id}}">Compare</label>
+                              </div>
+                          </div>
+                      </div>
+                  </td>
+                  <td>
+                      <div class="quantity-block mb-3">
+                          <div class="input-group mt-0">
+                              <button type="button" class="quantity-minus btn btn-gray btn-icon" data-type="minus"
+                                  data-field="" (click)="quantityDecrement(part)"><i
+                                      class="flaticon-minus-symbol"></i></button>
+                              <input type="text" name="quantity"
+                                  class="form-control quantity-input-number" value="{{part.quantity}}" min="1"
+                                  max="100">
+                              <button type="button" class="quantity-plus btn btn-gray btn-icon" data-type="plus"
+                                  data-field="" (click)="quantityIncrement(part)"><i
+                                      class="flaticon-plus-symbol"></i></button>
+                          </div>
+                          <button type="button" class="btn btn-primary btn-order w-100"
+                              (click)="addToCart(part);">Order</button>
+                      </div>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mb-4" *ngIf="isProductLoading === true">
+            <div class="row sm-gutters" style="justify-content: center;">
+              Loading
+              <img style="margin-left: 15px;"
+                src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+            </div>
+          </div>
+          <!--====  End of Desktop & Tablet View  ====-->
+
+          <!--=================================
+                    =            Mobile View            =
+                    ==================================-->
+
+          <ul class="product-list list-unstyled mobile-view">
+            <li *ngFor="let product of productData;">
+              <div class="media product-media d-flex flex-row align-items-stretch">
+                <!-- <img class="border mr-3" style="width: 30%;vertical-align:33%" src="{{product.images}}"> -->
+                <img *ngIf="product?.images[0]?.image_url != undefined" style="width: 30%;vertical-align:33%;"
+                  class="border col-6" src="{{product?.images[0]?.image_url}}">
+                <div *ngIf="product?.images[0]?.image_url == undefined"
+                  class="border col-6 d-flex flex-column justify-content-center">
+                  <img src="assets/images/footer-logo.png" class="rounded-circle footerLogPlaceHolder">
+                </div>
+                <div class="media-body col-6 align-items-center">
+                  <ul class="list-unstyled font-weight-bold">
+                    <li class="partno">{{product.product_nr}}</li>
+                    <li class="category">{{product.brand.name}} <span>{{product.description}}</span></li>
+                    <!--<li class="text-success stock"><i class="flaticon-tick mr-1"></i>In Stock</li>
+                                        <li class="delivery">Delivered By PM 19/12/18</li>-->
+                    <!-- <li class="price">$59.00</li> -->
+                    <li class="price" *ngIf="isPriceVisible === true">Nett: {{product.price_nett | currency: 'USD': 'symbol': '1.2-2'}}</li>
+                    <li class="price" *ngIf="isPriceVisible === true">Retail: {{product.price_retail | currency: 'USD': 'symbol': '1.2-2'}}</li>
+                  </ul>
+                  <div class="quantity-block">
+                    <div class="row sm-gutters">
+                      <div class="col">
+                        <div class="input-group">
+                          <button type="button" class="quantity-minus btn btn-gray btn-icon" data-type="minus"
+                            data-field=""><i class="flaticon-minus-symbol"
+                              (click)="quantityDecrement(product)"></i></button>
+                          <input type="text" class="form-control quantity-input-number" value="{{product.quantity}}"
+                            (change)="onQuantityChange(product)" min="1" max="100">
+                          <button type="button" class="quantity-plus btn btn-gray btn-icon" data-type="plus"
+                            data-field=""><i class="flaticon-plus-symbol"
+                              (click)="quantityIncrement(product)"></i></button>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <button type="button" class="btn btn-primary btn-order w-100"
+                          (click)="addToCart(product);">Order</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="compare-block">
+                    <div class="custom-control custom-checkbox compare-checkbox" (click)="onCompareChange(product)">
+                      <input type="checkbox" class="custom-control-input" id="compare_{{product.id}}" value="1"
+                        [checked]="product.is_compare == 0 ? false : true">
+                      <label class="custom-control-label" for="compare1_{{product.id}}">Compare</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li *ngIf="productData.length === 0 && !isProductLoading">
+              <div class="row sm-gutters">
+                <p style="margin: 0 auto;">No Part found.</p>
+              </div>
+            </li>
+            <li *ngIf="isProductLoading === true">
+              <div class="row sm-gutters" style="justify-content: center;">
+                Loading
+                <img style="margin-left: 15px;"
+                  src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+              </div>
+            </li>
+          </ul>
+          <!--====  End of Mobile View  ====-->
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<app-footer></app-footer>
+<app-compareoverlay *ngIf="compareProductList && compareProductList.length > 0 && visible" (visibleChange)="changeVisible($event)">
+</app-compareoverlay>
+
+<ng-template #catalogueBackOrderModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Part is not available</h4>
+    <!-- <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <p>Currently out of stock. Please back order or cancel.</p>
+  </div>
+  <div class="modal-footer">
+    <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button> -->
+    <button type="button" class="btn btn-outline-dark" (click)="cancelBackOrder()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addAsABackOrder()">Back Order</button>
+  </div>
+</ng-template>
+

@@ -1,0 +1,529 @@
+<app-header></app-header>
+<main *ngIf="orderList.length !== 0">
+  <div class="container">
+
+    <h3 class="my-4 text-dark">Your Order ({{orderList.length}} Items)</h3>
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="product-list-container">
+
+          <!--===========================================
+                            =            Desktop & Tablet View            =
+                            ============================================-->
+
+          <ul class="product-list list-unstyled desktop-view ">
+            <li class="product-list-header" *ngIf="orderList.length !== 0">
+              <div class="row sm-gutters">
+                <div class="col-5">PartNumber(s) & Name</div>
+                <div class="col">Vehicle</div>
+                <div class="col-1" *ngIf="isPriceVisible === true">Unit Price</div>
+                <div class="col-2">Quantity</div>
+                <div class="col-1">Sub-total</div>
+              </div>
+            </li>
+            <li *ngFor="let item of orderList">
+              <div class="row sm-gutters">
+                <div class="col-5 body-col part-body-col">
+                  <div class="row sm-gutters">
+                    <div class="col-md-3">
+                      <div class="part-inner-image w-100 h-100 border d-flex justify-content-center">
+                        <img *ngIf="item.product.images[0]?.image_url !== null" class="border" src="{{item.product.images[0]?.image_url}}">
+                        <img *ngIf="item.product.images[0]?.image_url === null" src="assets/images/footer-logo.png" style="opacity: 0.5; filter: sepia(0.7); width: 50px;" class="rounded-circle mr-3 p-2" alt="user-avatar">
+                      </div>
+                    </div>
+                    <div class="col-md-9">
+                      <div class="row sm-gutters">
+                        <div class="col-xl-5 col-5">
+                          <div class="part-inner-number">
+                            <ul class="list-unstyled">
+                              <li>{{item.product.company_sku}}</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-xl-7 col-7">
+                          <div class="part-inner-brand">
+                            <ul class="list-unstyled">
+                              <li>{{item.product.brand.name}} <span class="font-weight-normal">{{item.product.description}}</span>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="body-col vehicle-body-col">
+                    <ul class="list-inline">
+                      <li>
+                        {{item.product.vehicles[0]?.make?.name}} <span
+                          class="font-weight-normal">{{item.product.vehicles[0]?.model?.name}}
+                          {{item.product.vehicles[0]?.year_range}}</span>
+
+                      </li>
+                      <li></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-1" *ngIf="isPriceVisible === true">
+                  <div class="body-col">
+                    <ul class="list-unstyled">
+                      <li class="font-weight-normal">${{item.product.price_nett}}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-2">
+                  <div class="row sm-gutters">
+                    <div class="quantity-block mx-0">
+                      <div class="input-group">
+                        <button type="button" class="quantity-minus btn btn-gray btn-icon" data-type="minus"
+                          data-field="" (click)="decreseQuantityInCart(item.product)"><i
+                            class="flaticon-minus-symbol"></i></button>
+                        <input type="text" name="quantity" class="form-control quantity-input-number"
+                          value="{{item.product.quantity}}" min="1" max="100">
+                        <button type="button" class="quantity-plus btn btn-gray btn-icon" data-type="plus" data-field=""
+                          (click)="increseQuantityInCart(item.product)"><i class="flaticon-plus-symbol"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-1">
+                  <div class="body-col">
+                    <ul class="list-unstyled">
+                      <li>{{item.product.price_nett * item.product.quantity | currency: 'USD': 'symbol': '1.2-2'}}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li *ngIf="orderPlaced">Thank you for submitting the order. You will shortly receive a confirmation email.
+            </li>
+            <li></li>
+          </ul>
+          <!--====  End of Desktop & Tablet View  ====-->
+
+          <!--=================================
+                            =            Mobile View            =
+                            ==================================-->
+
+          <ul class="product-list list-unstyled mobile-view">
+            <li *ngFor="let item of orderList">
+              <div class="media product-media">
+                <img class="border mr-3 h-100" style="width: 100px; height: 100px !important;"
+                  src="{{item.product.images[0]?.image_url}}">
+                <div class="media-body">
+                  <ul class="list-unstyled font-weight-bold">
+                    <li class="partno">{{item.product.product_nr}} <span class="category">{{item.product.brand.name}} <span
+                          class="font-weight-normal">{{item.product.description}}</span></span></li>
+                    <li class="price">Unit Price: ${{item.product.price_nett}}</li>
+                  </ul>
+                  <div class="quantity-block">
+                    <div class="row sm-gutters">
+                      <div class="col-6">
+                        <div class="input-group">
+                          <button type="button" class="quantity-minus btn btn-gray btn-icon" data-type="minus"
+                            data-field="" (click)="decreseQuantityInCart(item.product)"><i
+                              class="flaticon-minus-symbol"></i></button>
+                          <input type="text" name="quantity" class="form-control quantity-input-number"
+                            value="{{item.product.quantity}}" min="1" max="100">
+                          <button type="button" class="quantity-plus btn btn-gray btn-icon" data-type="plus"
+                            data-field="" (click)="increseQuantityInCart(item.product)"><i
+                              class="flaticon-plus-symbol"></i></button>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <ul class="list-unstyled font-weight-bold mt-2">
+                          <li class="price">${{item.product.price_nett * item.product.quantity | currency: 'USD': 'symbol': '1.2-2'}}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <!--====  End of Mobile View  ====-->
+
+          <div class="row flex-sm-row-reverse" *ngIf="orderList.length !== 0">
+            <div class="col-lg-6 col-12 pt-lg-5 total-cart">
+              <div class="border p-3 col-sm-6 col-12 ml-auto mb-5">
+                <ul class="list-unstyled">
+                  <li class="row">
+                    <div class="col">Sub total</div>
+                    <div class="col text-right">{{cartSubTotal | currency: 'USD': 'symbol': '1.2-2'}}</div>
+                  </li>
+                  <!-- <li class="row">
+                    <div class="col">Delivery</div>
+                    <div class="col text-right">$ {{cartDeliveryCharges}}</div>
+                  </li> -->
+                  <li class="row">
+                    <div class="col">GST</div>
+                    <div class="col text-right">{{cartGST | currency: 'USD': 'symbol': '1.2-2'}}</div>
+                  </li>
+                  <li class="divider my-3 border-bottom"></li>
+                  <li class="row font-weight-bold">
+                    <div class="col">Total</div>
+                    <div class="col text-right">{{cartTotal | currency: 'USD': 'symbol': '1.2-2'}}</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-lg-6 col-12 pt-5">
+              <form [formGroup]="cartForm" (ngSubmit)="onCartFormSubmit()">
+                <div class="mb-5">
+                  <h4 class="text-dark">1. Select Fulfilment Method<br/>
+                    <!--div class="mt-2 mb-2" style="font-size: 14px; padding-left: 25px; color: #818181;">
+                      <span *ngIf="productFromUserState !== 0">{{currentUser.state}}: <b>{{productFromUserState}}</b></span>
+                      <span class="ml-2" *ngIf="(orderList.length - productFromUserState) !== 0">Interstate: <b>{{orderList.length - productFromUserState}}</b></span>
+                    </div-->
+                  </h4>
+                  <div class="row payment-options mb-4">
+                    <div class="col-sm-4 col-12 mb-3">
+                      <div class="custom-control custom-radio-button">
+                        <input type="radio" value="1" class="custom-control-input" id="delivery"
+                          formControlName="delivery_method" tabindex="1" autofocus>
+                        <label class="custom-control-label" for="delivery">
+                          <span class="d-block">Delivery</span>
+                          <!--<span class="d-block font-weight-bold text-dark"></span>-->
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-sm-3 col-12 mb-3">
+                      <div class="custom-control custom-radio-button">
+                        <input type="radio" value="2" class="custom-control-input" id="pickup"
+                          formControlName="delivery_method">
+                        <label class="custom-control-label" for="pickup">
+                          <span class="d-block">Pick Up</span>
+                          <!--<span class="d-block font-weight-bold text-dark">Now</span>-->
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-sm-5 col-12 ">
+                      <div class="custom-control custom-radio-button">
+                        <input type="radio" value="3" class="custom-control-input" id="pickupdeliver"
+                          formControlName="delivery_method">
+                        <label class="custom-control-label" for="pickupdeliver">
+                          <span class="d-block">Pick Up & Delivery</span>
+                          <!--<span class="d-block font-weight-bold text-dark">Various
+                            Dates</span>-->
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3" *ngIf="isDeliveryMethodSelected === true">
+                  <h4 class="text-dark mb-4">2. Enter Delivery Details</h4>
+                  <div class="row">
+                    <div class="col-sm-4 col-12 border-right pick-delivery-content"
+                      *ngIf="isPickUpMethodSelected === true">
+                      <p class="small font-weight-bold text-dark">Select items to be delivered</p>
+                      <ul class="list-unstyled payment-options">
+
+                        <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForDelivery">
+                          <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
+                            <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
+                              [checked]="order.product.selected"
+                              (change)="order.product.selected = !order.product.selected; onCheckDelivery(order.product);"
+                              [disabled]="order.product.disabled">
+                            <label class="custom-control-label" for="delivery_{{order.product.product_nr}}">
+                              <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
+                                <div style="height: 45px; width: 45px;" class="border">
+                                  <img *ngIf="order.product.images.length" [src]="order.product.images[0]?.image_url"
+                                    class="border align-self-center" width="50">
+                                  <img *ngIf="order.product.images.length == 0" src="assets/images/footer-logo.png"
+                                    class="border align-self-center" width="50" style="opacity: 0.5; filter: sepia(0.7); width: 50px;">
+                                </div>
+                                <div class="media-body">
+                                  <p class="mb-0 ml-2">{{order.product.product_nr}}</p>
+                                </div>
+                              </div>
+                            </label>
+                          </div>
+                        </li>
+                        <control-messages
+                          *ngIf="isCartFormSubmited && deliveryForm.controls.products.errors && deliveryProductIDs.length === 0"
+                          [control]="deliveryForm.get('products')"></control-messages>
+                      </ul>
+                    </div>
+                    <div class="row col-sm-8 col-12" formGroupName="delivery">
+                      <div class="form-group col-md-6 col-6">
+                        <label for="delivery.first_name">First Name</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="2" formControlName="first_name"
+                            id="delivery.first_name" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.first_name.errors"
+                          [control]="deliveryForm.get('first_name')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-6 col-6">
+                        <label for="delivery.last_name">Last Name</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="3" formControlName="last_name"
+                            id="delivery.last_name" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.last_name.errors"
+                          [control]="deliveryForm.get('last_name')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="delivery.company_name">Company</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="4" formControlName="company_name"
+                            id="delivery.company_name" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.company_name.errors"
+                          [control]="deliveryForm.get('company_name')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="delivery.address_line1">Delivery Address Line 1</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="5" formControlName="address_line1"
+                            id="delivery.address_line1" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.address_line1.errors"
+                          [control]="deliveryForm.get('address_line1')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="delivery.address_line2">Delivery Address Line 2</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="6" formControlName="address_line2"
+                            id="delivery.address_line2" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.address_line2.errors"
+                          [control]="deliveryForm.get('address_line2')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <div class="row">
+                          <div class="col-sm-6 col-6">
+                            <label for="delivery.state">State</label>
+                            <div class="input-animate">
+                              <select name="orderby" class="form-control" id="state" tabindex="7"
+                                formControlName="state" id="delivery.state">
+                                <option value="">Select a state</option>
+                                <option *ngFor="let state of stateList" [value]="state">{{state}}</option>
+                              </select>
+                              <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.state.errors"
+                              [control]="deliveryForm.get('state')"></control-messages>
+                          </div>
+                          <div class="col-sm-6 col-6">
+                            <label for="delivery.zip">Postal Code</label>
+                            <div class="input-animate">
+                              <input type="text" class="form-control" tabindex="8" formControlName="zip"
+                                id="delivery.zip" maxlength="4"/>
+                              <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.zip.errors"
+                              [control]="deliveryForm.get('zip')"></control-messages>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="delivery.mobile">Mobile</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="9" formControlName="mobile"
+                            id="delivery.mobile" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.mobile.errors"
+                          [control]="deliveryForm.get('mobile')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="delivery.email">Email</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="10" formControlName="email"
+                            id="delivery.email" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && deliveryForm.controls.email.errors"
+                          [control]="deliveryForm.get('email')"></control-messages>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3" *ngIf="isPickUpMethodSelected === true">
+                  <h4 class="text-dark mb-4"
+                    *ngIf="isPickUpMethodSelected === true && isDeliveryMethodSelected === true">3. Enter Pickup Details
+                  </h4>
+                  <h4 class="text-dark mb-4"
+                    *ngIf="isPickUpMethodSelected === true && isDeliveryMethodSelected === false">2. Enter Pickup
+                    Details</h4>
+                  <div class="row">
+                    <div class="col-sm-4 col-12 border-right pick-delivery-content"
+                      *ngIf="isDeliveryMethodSelected === true">
+                      <p class="small font-weight-bold text-dark">Select items to be pick up</p>
+                      <ul class="list-unstyled payment-options">
+                        <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForPickUp; let i = index;">
+                          <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
+                            <input type="checkbox" name="pickUp_{{order.product.id}}" id="pickUp_{{order.product.id}}"
+                              class="custom-control-input" [checked]="order.product.selected" (change)="onCheckPickUp(order.product)"
+                              [disabled]="order.product.disabled">
+                            <label class="custom-control-label" for="pickUp_{{order.product.id}}">
+                              <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
+                                <div style="height: 45px; width: 45px;" class="border">
+                                  <img *ngIf="order.product.images.length != 0" [src]="order.product.images[0].image_url"
+                                    class="border align-self-center" width="50">
+                                    <img *ngIf="order.product.images.length == 0" src="assets/images/footer-logo.png"
+                                    class="border align-self-center" width="50" style="opacity: 0.5; filter: sepia(0.7); width: 50px;">
+                                </div>
+                                <div class="media-body">
+                                  <p class="mb-0 ml-2">{{order.product.product_nr}}</p>
+                                </div>
+                              </div>
+                            </label>
+                          </div>
+                        </li>
+                        <control-messages
+                          *ngIf="isCartFormSubmited && pickUpForm.controls.products.errors && pickUpProductIDs.length === 0"
+                          [control]="pickUpForm.get('products')"></control-messages>
+                      </ul>
+                    </div>
+                    <div class="row col-sm-8 col-12" formGroupName="pickup">
+                      <div class="form-group col-md-6 col-6">
+                        <label for="pickup.first_name">First Name</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="11" formControlName="first_name"
+                            id="pickup.first_name" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.first_name.errors"
+                          [control]="cartForm.get('pickup.first_name')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-6 col-6">
+                        <label for="pickup.last_name">Last Name</label>
+                        <div class="input-animate">
+                          <input type="text" class="form-control" tabindex="12" formControlName="last_name"
+                            id="pickup.last_name" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.last_name.errors"
+                          [control]="cartForm.get('pickup.last_name')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="pickup.mobile">Mobile</label>
+                        <div class="input-animate">
+                          <input type="text" maxlength="12" class="form-control" tabindex="13" formControlName="mobile"
+                            id="pickup.mobile" />
+                          <span class="focus-border"><i></i></span>
+                        </div>
+                        <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.mobile.errors"
+                          [control]="cartForm.get('pickup.mobile')"></control-messages>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="pickup.location">Pick-up Location</label>
+                        <ul class="list-unstyled pickup-location">
+                          <li class="mb-3 overflow-hidden" *ngFor="let location of this.productAvailableLocations" >
+                            <div class="custom-control custom-checkbox location-checkbox">
+                              <input type="radio" formControlName="location" 
+                                [value]="location.id"
+                                (change)="updateDeliveryDate()" 
+                              />
+                              <label>
+                                <p class="mb-0 ml-2">{{location.name}}</p>
+                              </label>
+                            </div>
+                          </li>
+                          <li class="mb-3 overflow-hidden" *ngIf="this.productInterStateAvailable> 0" >
+                            <div class="custom-control custom-checkbox location-checkbox">
+                              <input type="radio" formControlName="location"
+                                [value]="9999" 
+                                (change)="updateDeliveryDate()" 
+                              />
+                              <label>
+                                <p class="mb-0 ml-2">Interstate</p>
+                              </label>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="form-group col-md-12 col-12">
+                        <label for="pickup.date">Pick-up & Time</label>
+                        <div class="row">
+                          <div class="col-sm-6 col-6">
+                            <div class="input-animate">
+                              <input class="form-control date-picker-bg" placeholder="YYYY-MM-DD" ngbDatepicker
+                                #datePicker="ngbDatepicker" tabindex="15" (click)="datePicker.toggle()"
+                                [minDate]="minDate"
+                                formControlName="date" id="pickup.date" readonly>
+                              <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.location.errors"
+                              [control]="cartForm.get('pickup.date')"></control-messages>
+                          </div>
+                          <div class="col-sm-6 col-6">
+                            <div class="input-animate">
+                              <select name="time" class="form-control" formControlName="time" id="pickup.time"
+                                (change)="validateDeliveryTime()" 
+                              >
+                                <option value="">Select time</option>
+                                <option *ngFor="let time of timeList" value="{{time}}">{{time}}</option>
+                              </select>
+                              <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.time.errors"
+                              [control]="cartForm.get('pickup.time')"></control-messages>
+                          </div>
+                          <div class="col-sm-12 col-12">
+                            <div class="error-message">{{pickupTimeError}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12 col-12 confirm-btn my-5">
+                  <div class="form-group"
+                    *ngIf="!(orderList.length === (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
+                    <ul class="invalid-feedback" style="display: block;">
+                      <li>
+                        Need to select all products according to delivery method you want to select.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="form-group" *ngIf="isOrderPlaceFailed === true">
+                    <ul class="invalid-feedback" style="display: block;" *ngFor="let key of objectKeys(messages)">
+                      <li>{{messages[key]}}</li>
+                    </ul>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-long" data-toggle="modal"
+                    data-target="#confirmationpopup" tabindex="16" [disabled]="isCartSubmitDisabled">Confirm</button>
+                  <img class="mr-3" *ngIf="loading"
+                    src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<app-reference-number *ngIf="isOrderPlaced === true" [order]="order"></app-reference-number>
+<app-footer></app-footer>
+
+<ng-template #cartBackOrderModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Part is not available</h4>
+    <!-- <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <p>Currently out of stock. Please back order or cancel.</p>
+  </div>
+  <div class="modal-footer">
+    <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button> -->
+    <button type="button" class="btn btn-outline-dark" (click)="cancelBackOrder()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addAsABackOrder()">Back Order</button>
+  </div>
+</ng-template>

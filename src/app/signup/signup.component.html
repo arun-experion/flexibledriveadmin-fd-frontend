@@ -1,0 +1,186 @@
+<main>
+    <header>
+        <div class="container"></div>
+    </header>
+    <section class="sign-up-section">
+        <div class="overlay-full login-gardient-overlay"></div>
+        <div class="overlay-full login-dark-overlay"></div>
+        <div class="login-body container">
+            <div class="row justify-content-center">
+                <!-- <div class="col-md-6">
+                    <div class="login-left-block text-white pt-lg-5">
+                        <img src="assets/images/logo-white.png">
+                        <div class="py-3 mt-2 d-none d-md-block">
+                            <p>Welcome to the FlexibleDrive’s Online Ordering System.</p>
+                            <p>We specialise in providing low volume solutions for niche OEMs.</p>
+                        </div>
+                        <a class="btn btn-outline-light d-none d-md-inline-block ripple" href="#">Watch Video</a>
+                    </div>
+                </div> -->
+                <div class="col-sm-12 col-md-6">
+                    <div class="signup-block">
+                        <div class="card login-card">
+                            <div class="card-body">
+                                <!-- <a [routerLink]="['/']"><img src="assets/images/logo.png"></a> -->
+                                <form [formGroup]="signupForm" (ngSubmit)="onSignUpSubmit()">
+                                    <div class="form-group">
+                                        <a [routerLink]="['/']"><img src="assets/images/logo.png"></a>
+                                    </div>
+                                    <!-- <div class="form-group">
+                                        <p class="text-center font-weight-bold text-dark">Sign Up to view Our Catalogue, Place Orders & More</p>
+                                    </div> -->
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <label for="first_name">First Name</label>
+                                                <div class="input-animate">
+                                                    <input type="text" class="form-control" id="first_name" tabindex="1" autofocus formControlName="first_name">
+                                                    <span class="focus-border"><i></i></span>
+                                                </div>
+                                                <control-messages *ngIf="isSignupSubmited && signupForm.controls.first_name.errors" [control]="signupForm.get('first_name')"></control-messages>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <label for="last_name">Last Name</label>
+                                                <div class="input-animate">
+                                                    <input type="text" class="form-control" id="last_name" tabindex="2" formControlName="last_name">
+                                                    <span class="focus-border"><i></i></span>
+                                                </div>
+                                                <control-messages *ngIf="isSignupSubmited && signupForm.controls.last_name.errors" [control]="signupForm.get('last_name')"></control-messages>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="company_name">Company</label>
+                                        <div class="input-animate">
+                                            <input type="text" class="form-control" id="company_name" tabindex="3" formControlName="company_name">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.company_name.errors" [control]="signupForm.get('company_name')"></control-messages>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address_line1">Delivery Address Line 1</label>
+                                        <div class="input-animate">
+                                            <input type="text" class="form-control" id="address_line1" tabindex="4" formControlName="address_line1">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.address_line1.errors" [control]="signupForm.get('address_line1')"></control-messages>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address_line2">Delivery Address Line 2</label>
+                                        <div class="input-animate">
+                                            <input type="text" class="form-control" id="address_line2" tabindex="5" formControlName="address_line2">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.address_line2.errors" [control]="signupForm.get('address_line2')"></control-messages>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <label for="state">State</label>
+                                                <div class="input-animate">
+                                                    <select name="orderby" class="form-control" id="state" formControlName="state" tabindex="6">
+                                                        <option value="">Select a state</option>
+                                                        <option *ngFor="let state of stateList" [value]="state">{{state}}</option>
+                                                      </select>
+                                                    <span class="focus-border"><i></i></span>
+                                                </div>
+                                                <control-messages *ngIf="isSignupSubmited && signupForm.controls.state.errors" [control]="signupForm.get('state')"></control-messages>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6">
+                                            <div class="form-group">
+                                                <label for="zip">Postal Code</label>
+                                                <div class="input-animate">
+                                                    <input type="text" class="form-control" id="zip" tabindex="7" formControlName="zip" maxlength="4">
+                                                    <span class="focus-border"><i></i></span>
+                                                </div>
+                                                <control-messages *ngIf="isSignupSubmited && signupForm.controls.zip.errors" [control]="signupForm.get('zip')"></control-messages>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mobile">Mobile</label>
+                                        <div class="input-animate">
+                                            <input type="text" class="form-control" id="mobile" tabindex="8" formControlName="mobile" maxlength="10">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.mobile.errors" [control]="signupForm.get('mobile')"></control-messages>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <div class="input-animate">
+                                            <input type="email" class="form-control" id="email" tabindex="9" formControlName="email">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.email.errors" [control]="signupForm.get('email')"></control-messages>
+                                    </div>
+                                    <div class="form-group d-flex justify-content-center">
+                                        <p class="text-center w-75">Your password must be at least 8 characters with 1 capital letter and 1 number.</p>
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <label for="password">Password</label>
+                                        <div class="input-animate">
+                                            <input type="password" class="form-control" id="password" tabindex="10" formControlName="password">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.password.errors" [control]="signupForm.get('password')"></control-messages>
+                                    </div>
+
+                                    <div class="form-group mb-4">
+                                        <label for="confirm_password">Confirm Password</label>
+                                        <div class="input-animate">
+                                            <input type="password" class="form-control" id="confirm_password" tabindex="11" formControlName="confirm_password">
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isSignupSubmited && signupForm.controls.confirm_password.errors" [control]="signupForm.get('confirm_password')"></control-messages>
+                                    </div>
+                                    <!-- <div class="form-group mb-4">
+                                              <a class="d-block text-primary font-weight-bold text-center" href="#">Forgot
+                                                  your password?</a>
+                                          </div> -->
+                                    <div class="form-group" *ngIf="isSignUpFailed === true">
+                                        <ul class="invalid-feedback" style="display: block;" *ngFor="let key of objectKeys(message)">
+                                            <li>{{message[key]}}</li>
+                                        </ul>
+                                    </div>
+                                    <!-- <div class="form-group text-center">
+                                        <a href="javaScript:void(0)" class="forgotPassword" tabindex="15">Forgot your
+                                            password?</a>
+                                    </div> -->
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary" tabindex="12">Sign Up</button>
+                                        <!-- <a type="submit" class="btn btn-primary" [routerLink]="'/dashboard'">Log In</a> -->
+                                        <img *ngIf="loading"
+                                            src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                                    </div>
+                                    <div class="form-group mb-5 mt-5">
+                                        <hr>
+                                    </div>
+                                    <div class="form-group">
+                                        <a [routerLink]="['/login']" class="btn btn-primary loginSignUp"
+                                            tabindex="14">Login</a>
+                                    </div>
+                                    <!-- <div class="form-group text-center">
+                                        <a href="javaScript:void(0)" class="forgotPassword" tabindex="13">View Catalogue As Guest</a>
+                                    </div> -->
+                                </form>
+                                <!-- <a class="btn btn-outline-primary" href="#">Sign Up</a> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="login-footer container">
+            <div class="row">
+                <div class="col">
+                    <a class="btn-text-icon d-flex justify-content-end text-white" href="#">View Catalogue As Guest
+                        <i class="flaticon-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</main>

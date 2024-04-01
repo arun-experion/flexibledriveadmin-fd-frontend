@@ -1,0 +1,44 @@
+.img-thumbnail{
+    height: 250px;
+}
+
+.mobielViewCompare{
+    overflow-x:auto;
+    width:100%;
+    -webkit-overflow-scrolling:touch!important;
+    -webkit-transform:translate3d(0,0,0)!important;
+    font-size: 14px;
+}
+
+.mobielViewCompare table td {
+    min-width: 180px;
+    max-width: 180px;
+}
+
+.mobielViewCompare::-webkit-scrollbar { width: 0 !important }
+.mobielViewCompare { overflow: -moz-scrollbars-none; }
+.mobielViewCompare { -ms-overflow-style: none; }
+
+.quantity-block{
+    max-width: initial !important;
+}
+.img-zoom-result {
+    border: 1px solid #d4d4d4;
+    /*set the size of the result div:*/
+    width: 650px;
+    height: 500px;
+    z-index: 1000000000!important;
+    /*background: #6c757d;*/
+    position: absolute!important;
+}
+.img-result-zoomed{
+    display: none;
+
+}
+.main-product-file:hover .img-result-zoomed{
+    background-color: blue!important;
+    display: block!important;
+}
+.low-opacity{
+    margin-left: -9999px;
+}

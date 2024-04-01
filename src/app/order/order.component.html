@@ -1,0 +1,458 @@
+<app-header></app-header>
+<main>
+    <section class="search-section">
+        <div class="overlay-full dark-overlay"></div>
+        <div class="container" id="searchByParts">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <h2 class="text-white font-weight-normal mb-3 text-center text-sm-left">Quick Search</h2>
+                </div>
+                <form class="col-12 row" [formGroup]="orderSearchForm" (ngSubmit)="submitSearchOrderForm()">
+                    <div class="col-sm-12 col-md-12 col-lg-8">
+                        <div class="search-group form-group">
+                            <div class="input-animate">
+                                <input class="form-control" type="search" placeholder="Enter order number"
+                                    formControlName="order_number">
+                                <button class="btn-search-icon" type="submit" name="submit"><i
+                                        class="flaticon-search"></i></button>
+                                <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isOrderSearchSubmit"
+                                [control]="orderSearchForm.get('order_number')"></control-messages>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-2">
+                        <div class="search-group form-group">
+                            <div class="input-animate">
+                                <input class="form-control" type="search" placeholder="From" ngbDatepicker
+                                    #fromDate="ngbDatepicker" (click)="fromDate.toggle()" formControlName="from_date"
+                                    style="padding-right: 30px;">
+                                <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isOrderSearchSubmit" [control]="orderSearchForm.get('from_date')">
+                            </control-messages>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-2">
+                        <div class="search-group form-group">
+                            <div class="input-animate">
+                                <input class="form-control" type="search" placeholder="To" ngbDatepicker
+                                    #toDate="ngbDatepicker" (click)="toDate.toggle()" formControlName="to_date"
+                                    style="padding-right: 30px;">
+                                <span class="focus-border"><i></i></span>
+                            </div>
+                            <control-messages *ngIf="isOrderSearchSubmit" [control]="orderSearchForm.get('to_date')">
+                            </control-messages>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="advance-search-form">
+        <div class="container py-5">
+            <p>{{searchAsAText}}</p>
+            <ngb-tabset>
+                <ngb-tab>
+                    <ng-template ngbTabTitle>
+                        <div (click)="tabChange(1)">
+                            Orders
+                        </div>
+                    </ng-template>
+                    <ng-template ngbTabContent>
+                        <p class="m-4" *ngIf="loading === false && orders.length === 0">Order list is not available for
+                            the user</p>
+                        <div class="m-4 text-center">
+                            <img *ngIf="loading === true && orders.length === 0"
+                                src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                        </div>
+
+                        <a *ngIf="selectedOrders.length !== 0" class="text-primary my-2" (click)="openModalToOrderDelete()"
+                            style="cursor: pointer; display: inline-block;">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        <a *ngIf="orders.length && selectedOrders.length === 0" class="text-muted my-2"
+                            style="display: inline-block;">
+                            <i class="fas fa-times"></i>
+                        </a>
+
+                        <span *ngIf="orders.length"> &nbsp; | &nbsp;</span>
+
+                        <a *ngIf="selectedOrders.length !== 0" class="text-primary" (click)="bulkExportOrder(true)"
+                            style="cursor: pointer;">
+                            <i class="fas fa-file-export"></i>
+                        </a>
+                        <a *ngIf="orders.length && selectedOrders.length === 0" class="text-muted my-2"
+                            style="display: inline-block;">
+                            <i class="fas fa-file-export"></i>
+                        </a>
+
+                        <span *ngIf="orders.length"> &nbsp; | &nbsp;</span>
+
+                        <a *ngIf="selectedOrders.length !== 0" class="text-primary" (click)="bulkExportOrder(false)"
+                            style="cursor: pointer;">
+                            <i class="fas fa-print"></i>
+                        </a>
+                        <a *ngIf="orders.length && selectedOrders.length === 0" class="text-muted my-2"
+                            style="display: inline-block;">
+                            <i class="fas fa-print"></i>
+                        </a>
+
+                        <div class="d-none d-md-block">
+                            <table class="table" *ngIf="orders.length !== 0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-top-0">
+                                            <div class="custom-control custom-checkbox order-checkbox">
+                                                <input type="checkbox" attr="product" id="order_1"
+                                                    class="custom-control-input" value="1" [checked]="isCheckedAll"
+                                                    (change)="selectAll()">
+                                                <label class="custom-control-label" for="order_1"></label>
+                                            </div>
+                                        </th>
+                                        <th class="border-top-0">Our Order No.</th>
+                                        <th class="border-top-0">Your Order No.</th>
+                                        <th class="border-top-0">Items</th>
+                                        <th class="border-top-0">Order Date</th>
+                                        <th class="border-top-0">Delivery Date</th>
+                                        <th class="border-top-0">Delivery Status</th>
+                                        <!-- <th class="border-top-0">&nbsp;</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let order of orders">
+                                        <td class="font-weight-bold text-primary">
+                                            <div class="custom-control custom-checkbox order-checkbox">
+                                                <input type="checkbox" attr="product" id="order_{{order.order_number}}"
+                                                    class="custom-control-input" value="1"
+                                                    [checked]="selectedOrders.includes(order)"
+                                                    (change)="selectOrder(order)">
+                                                <label class="custom-control-label"
+                                                    for="order_{{order.order_number}}"></label>
+                                            </div>
+                                        </td>
+                                        <td>{{order.order_number}}</td>
+                                        <td>{{order.reference_number}}</td>
+                                        <td>{{order.items.length}}</td>
+                                        <td>{{order.created_at}}</td>
+                                        <td>{{order.created_at}}</td>
+                                        <td>{{order.status_label}}</td>
+                                        <td align="right" width="150px">
+                                            <a (click)="exportOrder(order, true)"
+                                                class="text-primary d-inline text-right" style="cursor: pointer;">
+                                                <i class="fas fa-file-export"></i>
+                                            </a>
+                                            <span> | </span>
+                                            <a (click)="exportOrder(order, false)"
+                                                class="text-primary d-inline text-right" style="cursor: pointer;">
+                                                <i class="fas fa-print"></i>
+                                            </a>
+                                            <span> | </span>
+                                            <a *ngIf="order.status_label !== 'Cancelled'"
+                                                (click)="cancelOrderModal(order)"
+                                                class="text-primary d-inline text-right" style="cursor: pointer;">
+                                                <i class="fas fa-ban"></i>
+                                            </a>
+                                            <a *ngIf="order.status_label === 'Cancelled'"
+                                                class="d-inline text-right text-muted" style="cursor: pointer;">
+                                                <i class="fas fa-ban"></i>
+                                            </a>
+                                            <span *ngIf="order.status_label !== 'Cancelled'"> | </span>
+                                            <a *ngIf="order.is_favourite === false" (click)="addToStockOrder(order)"
+                                                class="text-primary d-inline text-right" style="cursor: pointer;">
+                                                <i class="fas fa-bookmark"></i>
+                                            </a>
+                                            <a *ngIf="order.is_favourite === true"
+                                                class="d-inline text-right text-muted">
+                                                <i class="fas fa-bookmark"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-block d-md-none">
+                            <table class="table" *ngIf="orders.length !== 0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-top-0">Our Order No.</th>
+                                        <th class="border-top-0">&nbsp;</th>
+                                        <th class="border-top-0">Delivery Date</th>
+                                        <th class="border-top-0">Delivery Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let order of orders">
+                                        <td>{{order.order_number}}</td>
+                                        <td>{{order.reference_number}}</td>
+                                        <td>{{order.created_at}}</td>
+                                        <td>{{order.status_label}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab>
+                    <ng-template ngbTabTitle>
+                        <div (click)="tabChange(2)">
+                            Favourite Orders
+                        </div>
+                    </ng-template>
+                    <ng-template ngbTabContent>
+                        <p class="m-4" *ngIf="loading === false && stockOrder.length === 0">Favourite order list is not
+                            available for the user</p>
+                        <div class="m-4 text-center">
+                            <img *ngIf="loading === true && stockOrder.length === 0"
+                                src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                        </div>
+                        <div class="d-none d-md-block">
+                            <table class="table" *ngIf="stockOrder.length !== 0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-top-0">Our Order No.</th>
+                                        <th class="border-top-0">Your Order No.</th>
+                                        <th class="border-top-0">Items</th>
+                                        <th class="border-top-0">Order Date</th>
+                                        <th class="border-top-0">Delivery Date</th>
+                                        <th class="border-top-0">Delivery Status</th>
+                                        <th class="border-top-0">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngFor="let order of stockOrder">
+                                        <tr>
+                                            <td>
+                                                <a class="text-primary" style="cursor: pointer;"
+                                                    (click)="showOrder(order)" *ngIf="order != selectedOrder">
+                                                    <i class="fas fa-angle-right"></i>
+                                                </a>
+                                                <a class="text-primary" style="cursor: pointer;" (click)="showOrder({})"
+                                                    *ngIf="order == selectedOrder">
+                                                    <i class="fas fa-angle-down"></i>
+                                                </a>
+
+                                                {{order.order.order_number}}
+                                            </td>
+                                            <td>{{order.order.reference_number}}</td>
+                                            <td>{{order.order.items.length}}</td>
+                                            <td>{{order.order.created_at}}</td>
+                                            <td>{{order.order.created_at}}</td>
+                                            <td>{{order.order.status_label}}</td>
+                                            <td>
+                                                <a *ngIf="order.status_label !== 'Cancelled'"
+                                                    (click)="removeFromFavourite(order)"
+                                                    class="text-primary d-inline text-right"
+                                                    style="cursor: pointer; text-transform: capitalize;">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                                <span> | </span>
+                                                <a (click)="reOrder(order)" class="text-primary d-inline text-right"
+                                                    style="cursor: pointer; text-transform: capitalize;">
+                                                    <i class="fas fa-cart-plus"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="order.order.delivery_info && order == selectedOrder">
+                                            <td colspan="7" class="p-0">
+                                                <table class="table">
+                                                    <tr>
+                                                        <td *ngIf="order.order.delivery_method === '3'" colspan="2">
+                                                            <span class="text-primary">Fulfilment Method:</span>
+                                                            {{order.order.delivery_type}}
+                                                        </td>
+                                                        <td *ngIf="order.order.delivery_method !== '3'">
+                                                            <span class="text-primary">Fulfilment Method: </span>
+                                                            {{order.order.delivery_type}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td *ngIf="order.order.delivery_info.delivery">
+                                                            <div class="text-primary">
+                                                                <strong>
+                                                                    Delivery Details:
+                                                                </strong>
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>First Name: </strong>
+                                                                {{order.order.delivery_info.delivery.first_name}}
+
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Last Name: </strong>
+                                                                {{order.order.delivery_info.delivery.last_name}}
+                                                            </div>
+
+                                                            <div class=""
+                                                                *ngIf="order.order.delivery_info.delivery.company_name">
+                                                                <strong>Company: </strong>
+                                                                {{order.order.delivery_info.delivery.company_name}}
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Address: </strong>
+                                                                <span
+                                                                    *ngIf="order.order.delivery_info.delivery.address_line1">{{order.order.delivery_info.delivery.address_line1}},
+                                                                </span>
+                                                                <span
+                                                                    *ngIf="order.order.delivery_info.delivery.address_line2">
+                                                                    {{order.order.delivery_info.delivery.address_line2}},
+                                                                </span>
+                                                                <span *ngIf="order.order.delivery_info.delivery.state">
+                                                                    {{order.order.delivery_info.delivery.state}},
+                                                                </span>
+                                                                <span *ngIf="order.order.delivery_info.delivery.zip">
+                                                                    {{order.order.delivery_info.delivery.zip}}
+                                                                </span>.
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Email: </strong>
+                                                                {{order.order.delivery_info.delivery.email}}
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Mobile: </strong>
+                                                                {{order.order.delivery_info.delivery.mobile}}
+                                                            </div>
+
+                                                        </td>
+                                                        <td *ngIf="order.order.delivery_info.pickup">
+                                                            <div class="text-primary">
+                                                                <strong>
+                                                                    Pickup Details:
+                                                                </strong>
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>First Name: </strong>
+                                                                {{order.order.delivery_info.pickup.first_name}}
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Last Name: </strong>
+                                                                {{order.order.delivery_info.pickup.last_name}}
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Mobile: </strong>
+                                                                {{order.order.delivery_info.pickup.mobile}}
+                                                            </div>
+                                                            <div class="">
+                                                                <strong>Pick-up Location: </strong>
+                                                                <div>
+                                                                    <strong>Address: </strong>
+                                                                    {{order.order.delivery_info.pickup.location.address}},
+                                                                    {{order.order.delivery_info.pickup.location.city}},
+                                                                    {{order.order.delivery_info.pickup.location.state}},
+                                                                    {{order.order.delivery_info.pickup.location.post_code}}.
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Contact: </strong>
+                                                                    {{order.order.delivery_info.pickup.location.mobile}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td *ngIf="order.order.delivery_info.delivery">
+                                                            <ng-container *ngFor="let part of order.order.items">
+                                                                <div class="d-flex mt-2 align-items-center"
+                                                                    *ngIf="order.order.delivery_info.delivery.products.indexOf(part.product_id) !== -1">
+                                                                    <img src="assets/images/footer-logo.png"
+                                                                        style="opacity: 0.5; filter: sepia(0.7); height: 70px;">
+                                                                    <div class="p-2 flex-grow-1">
+                                                                        <div>
+                                                                            Part number: {{part.product.company_sku}}
+                                                                        </div>
+                                                                        <div>
+                                                                            qty: {{part.qty}}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-container>
+                                                        </td>
+                                                        <td *ngIf="order.order.delivery_info.pickup">
+                                                            <ng-container *ngFor="let part of order.order.items">
+                                                                <div class="d-flex mt-2 align-items-center"
+                                                                    *ngIf="order.order.delivery_info.pickup.products.indexOf(part.product_id) !== -1">
+                                                                    <img src="assets/images/footer-logo.png"
+                                                                        style="opacity: 0.5; filter: sepia(0.7); height: 70px;">
+                                                                    <div class="p-2 flex-grow-1">
+                                                                        <div>
+                                                                            Part number: {{part.product.company_sku}}
+                                                                        </div>
+                                                                        <div>
+                                                                            qty: {{part.qty}}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-container>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" align="center">
+                                                            <button type="button" class="btn btn-primary"
+                                                                (click)="reOrder(order)"> Reorder</button>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-block d-md-none">
+                            <table class="table" *ngIf="stockOrder.length !== 0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-top-0">Our Order No.</th>
+                                        <th class="border-top-0">&nbsp;</th>
+                                        <th class="border-top-0">Delivery Date</th>
+                                        <th class="border-top-0">Delivery Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let order of stockOrder">
+                                        <td>{{order.order.order_number}}</td>
+                                        <td>{{order.order.reference_number}}</td>
+                                        <td>{{order.order.created_at}}</td>
+                                        <td>{{order.order.status_label}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </ng-template>
+                </ngb-tab>
+            </ngb-tabset>
+        </div>
+    </section>
+</main>
+<app-footer></app-footer>
+
+<ng-template #orderCancel let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" (click)="c('Close')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body col-sm-8 col-12 text-center mx-auto">
+        <p class="m-0">Are you sure, you want to cancel order?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-primary" (click)="cancelOrder(orderToCancel)">Yes</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="d('Cross click')">No</button>
+    </div>
+</ng-template>
+
+<ng-template #orderDelete let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" (click)="c('Close')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body col-sm-8 col-12 text-center mx-auto">
+        <p class="m-0">Are you sure, you want to delete selected order?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-primary" (click)="bulkDelete()">Yes</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="d('Cross click')">No</button>
+    </div>
+</ng-template>

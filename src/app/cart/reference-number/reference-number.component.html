@@ -1,0 +1,31 @@
+<ng-template #orderdetailpopup let-c="close" let-d="dismiss">
+        <div class="modal-header border-0 pb-0">
+            <button type="button" class="close" aria-label="Close" (click)="onSubmitOrderReferenceNumber()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body col-sm-8 col-12 text-center mx-auto">
+            <p class="m-0">Thank you for your order.</p>
+            <p>Your flexible drive order number is:</p>
+            <p class="h4 text-dark font-weight-bold">{{order.order_number}}</p>
+            <p class="m-0">Enter your purchase order or reference number here:</p>
+            <form [formGroup]="orderReferenceNumberForm" (ngSubmit)="onSubmitOrderReferenceNumber()">
+                <div class="form-group">
+                    <div class="input-animate my-4 border w-100 rounded">
+                        <input type="text" class="form-control" tabindex="2" formControlName="reference_number"
+                            placeholder="Purchase Order Number">
+                        <span class="focus-border"><i></i></span>
+                    </div>
+                    <control-messages *ngIf="isOrderReferenceFormSubmited"
+                        [control]="orderReferenceNumberForm.get('reference_number')"></control-messages>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-sm btn-primary mb-3 col-9" data-dismiss="modal" [disabled]="!orderReferenceNumberForm.valid">Save</button>
+                    <img *ngIf="loading"
+                        src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                </div>
+            </form>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3 col-9" (click)="onSubmitOrderReferenceNumber()">Back to
+                Home</button>
+        </div>
+    </ng-template>

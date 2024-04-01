@@ -1,0 +1,135 @@
+<app-header></app-header>
+<main>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="sidebar h-100">
+                    <h4 class="text-secondary mb-4">Settings</h4>
+                    <div class="ml-3">
+                        <ul class="list-unstyled">
+                            <li><a [routerLink]="['/profile']" class="text-primary">Profile</a></li>
+                            <!-- <li><a>Delivery Address</a></li> -->
+                            <li><a [routerLink]="['/change-password']">Change Password</a></li>
+                            <li><a href="javaScript:void(0)" (click)="userLogout()">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <h3 class="my-4 text-dark">Profile</h3>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form class="row mt-4" [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+                            <div class="form-group">
+                                <div class="media">
+                                    <img [src]="profileImage" class="rounded-circle" height="200" width="200px" (click)="selectFile.click()" style="cursor: pointer;"/>
+                                    <input class="invisible" type="file" name="" id="" (change)="handlerFileChange($event)" #selectFile>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6 col-6">
+                                <label for="first_name">First Name</label>
+                                <div class="input-animate">
+                                    <input type="text" class="form-control" id="first_name" formControlName="first_name" tabindex="1" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                                <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.first_name.errors" [control]="profileForm.get('first_name')"></control-messages>
+                            </div>
+                            <div class="form-group col-md-6 col-6">
+                                <label for="last_name">Last Name</label>
+                                <div class="input-animate">
+                                    <input type="text" class="form-control" id="last_name"  formControlName="last_name" tabindex="2" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                                <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.last_name.errors" [control]="profileForm.get('last_name')"></control-messages>
+                            </div>
+                            <div class="form-group col-md-12 col-12">
+                                <label for="company_name">Company</label>
+                                <div class="input-animate">
+                                    <input type="text" class="form-control" id="company_name" formControlName="company_name" tabindex="3" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                                <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.company_name.errors" [control]="profileForm.get('company_name')"></control-messages>
+                            </div>
+                            <!-- <div class="col-md-12 col-12" id="address" formGroupName="address" style="padding: 0;"> -->
+                            <div class="form-group col-md-12 col-12">
+                                <label for="address_line1">Delivery Address Line 1</label>
+                                <div class="input-animate">
+                                    <input type="text" class="form-control" id="address_line1"  formControlName="address_line1"
+                                        tabindex="4" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                                <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.address_line1.errors" [control]="profileForm.get('address_line1')"></control-messages>
+                            </div>
+                            <div class="form-group col-md-12 col-12">
+                                <label for="address_line2">Delivery Address Line 2</label>
+                                <div class="input-animate">
+                                    <input type="text" class="form-control" id="address_line2" formControlName="address_line2"
+                                        tabindex="5" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 col-12">
+                                <div class="row">
+                                    <div class="col-sm-6 col-6">
+                                        <label for="state">State</label>
+                                        <!-- <input type="text" class="form-control" id="state" placeholder="State" formControlName="state" /> -->
+                                        <div class="input-animate">
+                                            <select name="orderby" class="form-control" id="state"
+                                                formControlName="state" tabindex="6" id="state">
+                                                <option value="">Select a state</option>
+                                                <option *ngFor="let state of stateList" [value]="state">{{state}}
+                                                </option>
+                                            </select>
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+
+                                        <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.state.errors" [control]="profileForm.get('state')">
+                                        </control-messages>
+                                    </div>
+                                    <div class="col-sm-6 col-6">
+                                        <label for="zip">Postal Code</label>
+                                        <div class="input-animate">
+                                            <input type="text" class="form-control" id="zip" formControlName="zip" tabindex="7" />
+                                            <span class="focus-border"><i></i></span>
+                                        </div>
+                                        <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.zip.errors" [control]="profileForm.get('zip')">
+                                        </control-messages>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- </div> -->
+
+                            <div class="form-group col-md-12 col-12">
+                                <label for="mobile">Mobile</label>
+                                <div class="input-animate">
+                                    <!-- pattern="^\d{4}-\d{3}-\d{4}$"  -->
+                                    <input type="tel" class="form-control" id="mobile" formControlName="mobile" tabindex="8" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                                <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.mobile.errors" [control]="profileForm.get('mobile')"></control-messages>
+                            </div>
+                            <div class="form-group col-md-12 col-12">
+                                <label for="email">Email</label>
+                                <div class="input-animate">
+                                    <input type="email" class="form-control" id="email" formControlName="email" tabindex="9" />
+                                    <span class="focus-border"><i></i></span>
+                                </div>
+                                <control-messages *ngIf="isProfileFormSubmited && profileForm.controls.email.errors" [control]="profileForm.get('email')"></control-messages>
+                            </div>
+                            <div class="form-group" *ngIf="isProfileUpdateFailer === true">
+                                <ul class="invalid-feedback" style="display: block;" *ngFor="let key of objectKeys(message)">
+                                    <li>{{message[key]}}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-12 col-12 confirm-btn mt-3 mb-5 text-lg-right">
+                                <button type="submit" class="btn btn-primary btn-long" tabindex="10">submit</button>
+                                <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<app-footer></app-footer>

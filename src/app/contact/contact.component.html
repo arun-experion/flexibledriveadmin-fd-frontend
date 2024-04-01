@@ -1,0 +1,112 @@
+<app-header></app-header>
+<main>
+  <div class="container">
+    <div class="row my-sm-4 flex-sm-row-reverse">
+      <div class="col-lg-6 col-sm-6 px-sm-3 p-0">
+        <div id="map" class="h-100">
+            <div class="mapouter"><div class="gmap_canvas"><iframe width="600" height="500" id="gmap_canvas" src="https://www.google.com/maps/d/u/0/embed?mid=1Afnq7EgDfiV3Q5FgVavI8aPLWTw" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://www.embedgooglemap.net/blog/nordvpn-coupon-code/"></a></div><style>.mapouter{position:relative;text-align:right;height:500px;width:600px;}.gmap_canvas {overflow:hidden;background:none!important;height:500px;width:600px;}</style></div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-sm-6 pt-4 pt-sm-0">
+        <h3 class="mb-4 text-dark">Contact Us</h3>
+        <ul class="list-unstyled">
+          <li class="font-weight-bold text-dark">National Sales Number</li>
+          <li><a href="tel:1300363735" class="text-primary">1300 363 735</a> </li>
+          <li class="italic">Within Australia</li>
+        </ul>
+        <ul class="list-unstyled">
+          <li class="font-weight-bold text-dark">Head Office Administration</li>
+          <li>Tel: <a href="tel:+61393819200" class="text-primary">+61 3 9381 9200</a></li>
+        </ul>
+        <ul class="list-unstyled">
+          <li class="font-weight-bold text-dark">General Manager</li>
+          <li>Kevin Holmes</li>
+          <li><a href="tel:+61393819208" class="text-primary">+61 3 9381 9208</a> </li>
+          <!-- <li><a href="mailto:dbagatella@flexibledrive.com.au" class="text-primary">dbagatella@flexibledrive.com.au</a>
+          </li> -->
+        </ul>
+        <ul class="list-unstyled">
+          <li class="font-weight-bold text-dark">State Sales Offices Opening Hours</li>
+          <li>Monday - Friday : 8am - 5pm (EST)</li>
+        </ul>
+        <ul class="list-inline">
+          <li class="text-dark list-inline-item">VIC</li>
+          <li class="list-inline-item"><a href="tel:+61393819222" class="text-primary">+61 3 9381 9222</a>
+          </li>
+          <li class="d-block"></li>
+          <li class="text-dark list-inline-item">TAS</li>
+          <li class="list-inline-item"><a href="tel:+61362142600" class="text-primary">+61 3 6214 2600</a>
+          </li>
+          <li class="d-block"></li>
+          <li class="text-dark list-inline-item">NSW</li>
+          <li class="list-inline-item"><a href="tel:+61299337400" class="text-primary">+61 2 9933 7400</a>
+          </li>
+          <li class="d-block"></li>
+          <li class="text-dark list-inline-item">QLD</li>
+          <li class="list-inline-item"><a href="tel:+61737283800" class="text-primary">+61 7 3728 3800</a>
+          </li>
+          <li class="d-block"></li>
+          <li class="text-dark list-inline-item">WA</li>
+          <li class="list-inline-item"><a href="tel:+61892294900" class="text-primary">+61 8 9229 4900</a>
+          </li>
+          <li class="d-block"></li>
+          <li class="text-dark list-inline-item">SA</li>
+          <li class="list-inline-item"><a href="tel:+61881393600" class="text-primary">+61 8 8139 3600</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="py-4 border-top">
+    <div class="container">
+      <h3 class="mb-4 text-dark">Make an Enquiry</h3>
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmitContactForm()">
+        <div class="row my-4">
+          <div class="col-lg-5 col-sm-5 col-12">
+            <div class="row">
+              <div class="form-group col-md-6 col-6">
+                <label for="first_name">First Name</label>
+                <input type="text" class="form-control" id="first_name" formControlName="first_name" tabindex="1"
+                  autofocus />
+                <control-messages *ngIf="isContactFormSubmit === true" [control]="contactForm.get('first_name')"></control-messages>
+              </div>
+              <div class="form-group col-md-6 col-6">
+                <label for="last_name">Last Name</label>
+                <input type="text" class="form-control" id="last_name" formControlName="last_name" tabindex="2" />
+                <control-messages *ngIf="isContactFormSubmit === true" [control]="contactForm.get('last_name')"></control-messages>
+              </div>
+              <div class="form-group col-md-12 col-12">
+                <label for="company">Company</label>
+                <input type="text" class="form-control" id="company" formControlName="company" tabindex="3" />
+                <control-messages *ngIf="isContactFormSubmit === true" [control]="contactForm.get('company')"></control-messages>
+              </div>
+              <div class="form-group col-md-12 col-12">
+                <label for="mobile">Mobile</label>
+                <input type="text" maxlength="10" class="form-control" id="mobile" formControlName="mobile"
+                  tabindex="4" />
+                <control-messages *ngIf="isContactFormSubmit === true" [control]="contactForm.get('mobile')"></control-messages>
+              </div>
+              <div class="form-group col-md-12 col-12">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" formControlName="email" tabindex="5" />
+                <control-messages *ngIf="isContactFormSubmit === true" [control]="contactForm.get('email')"></control-messages>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-7 col-sm-7 col-12 pt-sm-3">
+            <textarea rows="13" class="form-control mt-3" placeholder="Enter message here" id="message"
+              formControlName="message" tabindex="6"></textarea>
+              <control-messages *ngIf="isContactFormSubmit === true" [control]="contactForm.get('message')"></control-messages>
+          </div>
+          <div class="col-sm-12 col-12 mt-4">
+            <div class="g-recaptcha" data-sitekey="6LfCHLUUAAAAAOcwwIsjuL5BlMeikilTkdKc70sW"></div>
+          </div>
+          <div class="col-sm-12 col-12 my-4">
+            <button type="submit" class="btn btn-primary btn-long" tabindex="6">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+<app-footer></app-footer>

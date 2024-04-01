@@ -1,0 +1,33 @@
+.imageRounded {
+    width: 60px;
+    height: 60px;
+    overflow:hidden;
+}
+
+.imageRounded img{
+    height: 100%;
+    min-width: 100%;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+}
+.img-zoom-result {
+    border: 1px solid #d4d4d4;
+    /*set the size of the result div:*/
+    width: 650px;
+    height: 500px;
+    z-index: 1000000000!important;
+    /*background: #6c757d;*/
+    position: absolute!important;
+}
+.img-result-zoomed{
+    display: none;
+
+}
+.main-product-file:hover .img-result-zoomed{
+    background-color: blue!important;
+    display: block!important;
+}
+.low-opacity{
+    margin-left: -9999px;
+}

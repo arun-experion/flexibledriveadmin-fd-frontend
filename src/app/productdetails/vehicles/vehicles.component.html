@@ -1,0 +1,23 @@
+<p class="mb-0 text-muted">
+    Vehicle
+</p>
+<div class="overflow-auto mb-3 pr-3" style="max-height: 180px;">
+    <table class="table vehicleTable">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" style="text-align: center;">Vehicle name</th>
+                <th scope="col" align="center" style="text-align: center;">Vehicle model</th>
+                <th scope="col" align="center" style="text-align: center;">Year range</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let vehicl of vehicles; let i = index">
+                <td scope="row">{{i + 1}}</td>
+                <td align="center">{{vehicl.make.name}}</td>
+                <td align="center">{{vehicl.model.name}}</td>
+                <td align="center">{{vehicl.year_range}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

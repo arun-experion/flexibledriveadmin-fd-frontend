@@ -1,0 +1,155 @@
+<main>
+  <header>
+    <div class="container"></div>
+  </header>
+  <section class="login-section">
+    <div class="overlay-full login-gardient-overlay"></div>
+    <div class="overlay-full login-dark-overlay"></div>
+    <div class="login-body container">
+      <div class="row justify-content-between">
+        <div class="col-md-6">
+          <div class="login-left-block text-white pt-lg-5">
+            <img src="assets/images/logo-white1.png">
+            <div class="py-3 mt-2 d-none d-md-block">
+              <p>Welcome to the Online catalogue for Flexible Drive. This catalogue presents vehicle specific applications for Resellers allowing you to search, find, buy and manage your parts requirements. If you need any assistance, please call <a class="text-primary" href="tel:+1300363935">1300 363 735</a> </p>
+            </div>
+            <a href="javascript:void(0)" class="btn btn-outline-light d-md-inline-block" id="modal_trigger" (click)="openVideoModal(videoModal)">Watch Video</a>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="login-right-block">
+            <div class="card login-card">
+              <div class="card-body">
+                <form [formGroup]="resetPasswordForm" (ngSubmit)="onResetPasswordSubmit()" *ngIf="isResetPassword === true">
+                  <div class="form-group mb-4">
+                    <label for="password">Password</label>
+                    <div class="input-animate">
+                      <input type="hidden" formControlName="token">
+                      <input type="password" class="form-control" id="password" formControlName="password" tabindex="1">
+                      <span class="focus-border"><i></i></span>
+                    </div>
+                    <control-messages [control]="resetPasswordForm.get('password')"></control-messages>
+                  </div>
+                  <div class="form-group mb-4">
+                      <label for="confirm_password">Confirm Password</label>
+                      <div class="input-animate">
+                          <input type="password" class="form-control" id="confirm_password" tabindex="2" formControlName="confirm_password">
+                          <span class="focus-border"><i></i></span>
+                      </div>
+                      <control-messages [control]="resetPasswordForm.get('confirm_password')"></control-messages>
+                  </div>
+                  <div class="form-group" *ngIf="isResetPasswordFailed === true && isMessageString === false">
+                      <ul class="invalid-feedback" style="display: block;" *ngFor="let key of objectKeys(messages)">
+                          <li>{{messages[key]}}</li>
+                      </ul>
+                  </div>
+                  <div class="form-group" *ngIf="isResetPasswordFailed === true && isMessageString === true">
+                      <ul class="invalid-feedback" style="display: block;">
+                          <li>{{messages}}</li>
+                      </ul>
+                  </div>
+                  <div class="form-group">
+                      <button type="submit" class="btn btn-primary" tabindex="3">Reset Password</button>
+                      <!-- <a type="submit" class="btn btn-primary" [routerLink]="'/dashboard'">Log In</a> -->
+                      <img *ngIf="loading"
+                        src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                    </div>
+                </form>
+
+                <form [formGroup]="forgotPasswordForm" (ngSubmit)="onForgotPasswordSubmit()" *ngIf="isForgotPassword === true">
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-animate">
+                      <input type="email" class="form-control" id="email" placeholder="Email" formControlName="email"
+                        tabindex="1" autofocus>
+                      <span class="focus-border"><i></i></span>
+                    </div>
+                    <control-messages [control]="forgotPasswordForm.get('email')"></control-messages>
+                  </div>
+                  <div class="form-group">
+                      <button type="submit" class="btn btn-primary" [disabled]="submitted" tabindex="3">Forgot Password</button>
+                      <!-- <a type="submit" class="btn btn-primary" [routerLink]="'/dashboard'">Log In</a> -->
+                      <img *ngIf="loading"
+                        src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                    </div>
+                    <hr class="mb-4 mt-4">
+                    <div class="form-group">
+                      <a [routerLink]="['/']" class="btn btn-primary loginSignUp" tabindex="5">Login</a>
+                    </div>
+                </form>
+
+                <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" *ngIf="isLogin === true">
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-animate">
+                      <input type="email" class="form-control" id="email" placeholder="Email" formControlName="email"
+                        tabindex="1" autofocus>
+                      <span class="focus-border"><i></i></span>
+                    </div>
+                    <control-messages [control]="loginForm.get('email')"></control-messages>
+                  </div>
+                  <div class="form-group mb-4">
+                    <label for="password">Password</label>
+                    <div class="input-animate">
+                      <input type="password" class="form-control" id="password" placeholder="Password"
+                        formControlName="password" tabindex="2">
+                      <span class="focus-border"><i></i></span>
+                    </div>
+                    <control-messages [control]="loginForm.get('password')"></control-messages>
+                  </div>
+                  <!-- <div class="form-group mb-4">
+                                        <a class="d-block text-primary font-weight-bold text-center" href="#">Forgot
+                                            your password?</a>
+                                    </div> -->
+                  <div class="form-group" *ngIf="isLoginFailed === true">
+                    <div class="invalid-feedback" style="display: block;">{{loginErrorMessage}}</div>
+                  </div>
+				  <div class="form-group" *ngIf="inactiveUserMesage =='Account is disabled.'">
+                    <div class="invalid-feedback" style="display: block;">{{inactiveUserMesage}}</div>
+                  </div>
+                  <div class="form-group text-center">
+                    <a [routerLink]="['/forgot-password']" class="forgotPassword" tabindex="4">Forgot your password?</a>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary" [disabled]="submitted" tabindex="3">Log In</button>
+                    <!-- <a type="submit" class="btn btn-primary" [routerLink]="'/dashboard'">Log In</a> -->
+                    <img *ngIf="loading"
+                      src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                  </div>
+                  <div class="form-group">
+                    <a [routerLink]="['/signup']" class="btn btn-primary loginSignUp" tabindex="5">Sign Up</a>
+                  </div>
+                </form>
+                <!-- <a class="btn btn-outline-primary" href="#">Sign Up</a> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="login-footer container">
+      <div class="row">
+        <div class="col">
+          <a class="btn-text-icon d-flex justify-content-end text-white" href="#">View Catalogue As Guest
+            <i class="flaticon-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <ng-template #videoModal let-modal>
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <video id="main_video" width="100%" controls>
+          <source src="{{videoBaseUrl}}/video.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </ng-template>
+
+  </section>
+</main>

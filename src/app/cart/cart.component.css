@@ -1,0 +1,85 @@
+.round {
+    position: relative;
+   }
+   
+   .round label {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 28px;
+    left: 0;
+    position: relative;
+    top: 0;
+    width: 28px;
+    margin-right: 15px;
+   }
+   
+   .round label:after {
+    border: 2px solid #fff;
+    border-top: none;
+    border-right: none;
+    content: "";
+    height: 6px;
+    left: 7px;
+    opacity: 0;
+    position: absolute;
+    top: 8px;
+    transform: rotate(-45deg);
+    width: 12px;
+    margin-right: 15px;
+   }
+   
+   .round input[type="checkbox"] {
+    visibility: hidden;
+    margin-left: -20px;
+   }
+   
+   .round input[type="checkbox"]:checked + label {
+    background-color: #ef5324;
+    border-color: #ef5324;
+   }
+   
+   .round input[type="checkbox"]:checked + label:after {
+    opacity: 1;
+   }
+   
+   body {
+    background-color: #f1f2f3;
+   }
+   table{ 
+        width: 50%;
+        border:1px solid #dee2e6;
+        float: right;
+    }
+    .textright{
+        text-align: right;
+    }
+    .colorblack{
+        color: #333;
+    }
+    .quantity-block{
+        margin: unset;
+    }
+    .bordertop{
+        border-top: 1px solid #dee2e6; 
+    }
+
+
+    .compare-checkbox.order-checkbox .custom-control-label::before, 
+    .compare-checkbox.order-checkbox .custom-control-label::after {
+        top: 10px;
+        left: 5px;
+    }
+
+    .compare-checkbox.order-checkbox{
+        text-align: left;
+    }
+
+    .compare-checkbox .custom-control-label .order-info{
+        padding-left: 30px;
+    }
+
+    .date-picker-bg{
+        background-color: white;
+    }

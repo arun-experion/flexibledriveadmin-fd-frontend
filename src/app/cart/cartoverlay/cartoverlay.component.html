@@ -1,0 +1,71 @@
+<div class="popup-section p-0 cart-popup-section" [@cartoverlay] *ngIf="visible">
+        <div class="popup-container">
+            <div class="popup-body">
+                <h5 class="text-secondary">Your Order ({{cartProductCount}})</h5>
+                <button id="btn-close-cart" class="btn btn-close btn-close-cart shadow-none p-0" (click)="close()"><i class="flaticon-cancel"></i></button>
+                <ul class="compare-list list-unstyled">
+                    <li class="row"  *ngFor="let item of productCartData;" >
+                        <div class="media align-items-center col-6">
+                            <button class="btn btn-icon shadow-none p-0 removeBtn" (click)="removeFromCart(item.product)"><i class="flaticon-cancel"></i></button>
+                            <!-- <img class="border mx-3 h-100" src="{{item.product.images[0]?.image_url}}"> -->
+                            <img *ngIf="item.product.images[0]?.image_url !== null" class="border mx-3 h-100" src="{{item.product.images[0]?.image_url}}">
+                            <img *ngIf="item.product.images[0]?.image_url === null" src="assets/images/footer-logo.png" class="rounded-circle" style="opacity: 0.5; filter: sepia(0.7);" alt="user-avatar">
+                            <div class="media-body font-weight-bold">{{item.product.company_sku}}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row align-items-center">
+                                <div class="quantity-block col">
+                                    <div class="row sm-gutters">
+                                        <div class="input-group m-0">
+                                            <div class="input-group">
+                                                <button type="button" class="quantity-minus btn btn-gray btn-icon"  data-type="minus" data-field=""><i class="flaticon-minus-symbol" (click)="quantityDecrement(item.product)"></i></button>
+                                                <input type="text" class="form-control quantity-input-number" value="{{item.product.quantity}}" (change)="onQuantityChange(item.product)" min="1" max="100">
+                                                <button type="button" class="quantity-plus btn btn-gray btn-icon" data-type="plus" data-field=""><i class="flaticon-plus-symbol" (click)="quantityIncrement(item.product)"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col" *ngIf="isPriceVisible === true">
+                                    <p class="m-0 text-right"> ${{item.product.price_nett * item.product.quantity}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="row" *ngIf="cartProductCount > 0">
+                    <div class="col pl-lg-2 px-1">
+                        <button class="btn btn-outline-secondary w-100" (click)="addMore()">Add More</button>
+                    </div>
+                    <div class="col pl-lg-0 px-1">
+                        <button class="btn btn-primary w-100" (click)="close()" routerLink="/cart" >Confirm Order</button>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-body hide" id="empty-cart" *ngIf="cartProductCount == 0">
+                <h5 class="text-secondary">Your Order (0)</h5>
+                <button id="btn-close-cart" class="btn btn-close shadow-none p-0" (click)="close()"><i class="flaticon-cancel"></i></button>
+                <div class="row align-items-center p-3">
+                    <img src="assets/images/empty.png" class="mx-auto" />
+                    <p class="my-3 text-center w-100 text-muted">You do not have any parts in your order.</p>
+                </div>
+                <div class="row">
+                    <div class="col pl-2">
+                        <button class="btn btn-outline-secondary w-100" routerLink="/catalogue">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-template #cartOverlayBackOrderModal let-modal>
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal-basic-title">Part is not available</h4>
+        </div>
+        <div class="modal-body">
+          <p>Currently out of stock. Please back order or cancel.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-dark" (click)="cancelBackOrder()">Cancel</button>
+          <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button> -->
+          <button type="button" class="btn btn-primary" (click)="addAsABackOrder()">Back Order</button>
+        </div>
+      </ng-template>

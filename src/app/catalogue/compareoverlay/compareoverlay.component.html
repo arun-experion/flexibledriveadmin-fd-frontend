@@ -1,0 +1,28 @@
+<div class="popup-section compare-popup-section">
+    <div class="popup-container">
+        <div class="popup-body">
+            <h5 class="text-secondary">Compare List</h5>
+            <button id="btn-close" class="btn btn-close shadow-none p-0"><i class="flaticon-cancel" *ngIf="closable" (click)="close()"></i></button>
+            <ul class="compare-list list-unstyled">
+                <li *ngFor="let productRow of compareProductList;">
+                    <div class="media align-items-center">
+                        <button class="btn btn-icon shadow-none p-0" (click)="removeProductFromCompare(productRow)"><i class="flaticon-cancel"></i></button>
+                        <img *ngIf="productRow?.images[0]?.image_url !== null" class="border mx-3 h-100" [src]="[productRow?.images[0]?.image_url]">
+                        <img *ngIf="productRow?.images[0]?.image_url === null" src="assets/images/footer-logo.png" class="rounded-circle border mx-3 h-100" style="opacity: 0.5; filter: sepia(0.7);" alt="user-avatar">
+                        <div class="media-body font-weight-bold">{{productRow.company_sku}}</div>
+                    </div>
+                </li>
+            </ul>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-outline-secondary w-100" (click)="removeAllCompare()">Remove All</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" [routerLink] = "['/compareproduct']">Compare</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="full-body-overly"></div>

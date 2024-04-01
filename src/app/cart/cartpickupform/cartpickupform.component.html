@@ -1,0 +1,60 @@
+<!-- Pick Up Form -->
+<div [@cartpickupform] *ngIf="visible">
+    <h5>2. Enter Pickup Details</h5>
+    <form>
+        <div class="col-md-12">
+            <div class="row sm-gutters">
+                <div class="col-xl-6 form-group">
+                    <label for="firstNamePickup">First Name</label>
+                    <input type="text" class="form-control" id="firstNamePickup">
+                </div>
+                <div class="col-xl-6 form-group">
+                    <label for="lastNamePickup">Last Name</label>
+                    <input type="text" class="form-control" id="lastNamePickup">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mobilePickup">Mobile</label>
+                <input type="text" class="form-control" id="mobilePickup">
+            </div>
+            <div class="form-group">
+                <label for="locationPickup">Pick-up Location</label>
+                <select class="form-control" id="locationPickup">
+                    <option>Location</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <span for="addressPickup"><b>Address: </b>91 Stubbs St. Kensington VIC 3031</span><br>
+                <span for="contactNumberPickup"><b>Contact Number: </b>1300363935</span>
+            </div>
+            <div class="row sm-gutters">
+                <div class="col-xl-6 form-group">
+                    <label for="datePickup">Pick-up Date & Time</label>
+                    <select class="form-control" id="datePickup">
+                        <option>Date</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+                <div class="col-xl-6 form-group">
+                    <label for="timePickup">&nbsp;</label>
+                    <select class="form-control" id="timePickup">
+                        <option>Time</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Confirm</button>
+        </div>
+    </form><br>
+</div>
+<!-- Pick Up Form -->

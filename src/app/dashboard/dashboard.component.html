@@ -1,0 +1,276 @@
+<app-header></app-header>
+<main>
+  <section class="search-section">
+    <div class="overlay-full dark-overlay"></div>
+    <div class="container" id="searchByParts">
+      <div class="row align-items-center">
+        <div class="col-12">
+          <h2 class="text-white font-weight-normal mb-3 text-center text-sm-left">Quick search</h2>
+        </div>
+        <div class="col-lg-9 col-md-8">
+          <div class="search-group form-group">
+            <form [formGroup]="quickSearchForm" (ngSubmit)="onQuickSearchFormSubmit()">
+              <input class="form-control" type="search" placeholder="Enter part number"
+                formControlName="product_nr" tabindex="1">
+              <button class="btn-search-icon" type="submit" name="submit" [disabled]="!quickSearchForm.valid"><i
+                  class="flaticon-search"></i></button></form>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4 form-group">
+          <button class="btn btn-primary btn-block advancebtn" type="button" [disabled]="!quickSearchForm.valid"
+            (click)="onQuickSearchFormSubmit()">Find my part</button>
+        </div>
+      </div>
+    </div>
+    <div class="container hide" id="searchByVIN">
+      <div class="row align-items-center">
+        <div class="col-12">
+          <h2 class="text-white font-weight-normal mb-3">Or search by vehicle details</h2>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Vehicle Registration</label>
+            <input class="form-control" type="search" name="search" placeholder="Enter part number">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>VIN</label>
+            <input class="form-control" type="search" name="search" placeholder="Enter part number">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Product Catergory</label>
+            <select name="orderby" class="form-control">
+              <option value="0" selected="selected">Select Product Category</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="advance-search-form">
+    <div class="container py-5">
+      <h2 class="font-weight-normal text-dark mb-3 d-none d-sm-block">Or by registration and VIN</h2>
+      <h3 class="font-weight-normal text-dark mb-3 d-sm-none">Search by vehicle details</h3>
+      <form [formGroup]="registrationOrVINSearchForm" (ngSubmit)="onVinSearchFormSubmit()">
+        <div class="row">
+          <div class="col-lg-7 col-md-6">
+            <div class="form-group stateList d-flex bd-highlight">
+              <!-- <label for="state" class="d-flex form-control">Vehicle Registration</label> -->
+              <input class="form-control d-flex" type="text" name="rego_number" placeholder="Vehicle Registration"
+                id="rego_number" formControlName="rego_number" style="text-transform: uppercase;">
+              <select name="orderby" class="form-control" id="state" formControlName="state">
+                <option value="">Select State</option>
+                <option *ngFor="let state of stateList" [value]="state">{{state}}</option>
+              </select>
+              <button type="button" class="btn btn-primary searchbutton has-ripple" (click) = "getProductCountByResigNState()"><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+          <div class="col-lg-5 col-md-6">
+            <div class="form-group stateList d-flex bd-highlight">
+              <!-- <label for="vin_number" class="d-flex">vin_number</label> -->
+              <input class="form-control" type="text" name="vin_number" placeholder="VIN" id="vin_number" formControlName="vin_number">
+              <button type="button" class="btn btn-primary searchbutton has-ripple" (click) = "getProductCountByVin()"><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+          <div class="col-lg-7 col-md-6 vehicle-list" *ngIf="this.vehiclesLoaded">
+            <div class="row" *ngFor="let vehicle of this.vehicles">
+              <div class="col-md-2">{{vehicle.MakeName}}</div>
+              <div class="col-md-2">{{vehicle.Model}}</div>
+              <div class="col-md-2">{{vehicle.YearRange}}</div>
+              <div class="col-md-2 remove-vehicle-row-cross-btn" (click)="removeVehicleRow()">X</div>
+            </div>
+          </div>
+          <div class="col-md-12 text-center mt-3">
+            <div class="col-md-6 col-lg-4 mx-auto p-0 px-sm-2">
+              <button class="btn btn-primary btn-block" [disabled]="!registrationOrVINSearchForm.valid"
+                type="submit">Show me {{vinProductCount}} parts</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="advance-search-form">
+    <div class="container py-5">
+      <h2 class="font-weight-normal text-dark mb-3 d-none d-sm-block">Or search by vehicle details</h2>
+      <h3 class="font-weight-normal text-dark mb-3 d-sm-none">Search by vehicle details</h3>
+      <form [formGroup]="advanceSearchForm" (ngSubmit)="onAdvanceSearchSubmit()">
+        <div class="row">
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="make_id">Make</label>
+              <!-- <select *ngIf="makeList" name="orderby" class="form-control" id="make_id" formControlName="make_id">
+                <option value="">Select a make</option>
+                <option *ngFor="let make of makeList.common" [value]="make.id">{{make.name}}</option>
+                <option value="">------------</option>
+                <option *ngFor="let make of makeList.all" [value]="make.id">{{make.name}}</option>
+              </select> -->
+              <div class="row">
+                <div class="ng-autocomplete col-lg-12">
+                  <ng-autocomplete
+                    [data]="autofilData"
+                    [searchKeyword]="keyword"
+                    (selected)='selectEvent($event)'
+                    (inputCleared)='onInputCleared($event)'
+                    (inputFocused)='onFocused($event)'
+                    [itemTemplate]="itemTemplate"
+                    [notFoundTemplate]="notFoundTemplate">
+                  </ng-autocomplete>
+
+                  <ng-template #itemTemplate let-item>
+                    <a [innerHTML]="item.name"></a>
+                  </ng-template>
+
+                  <ng-template #notFoundTemplate let-notFound>
+                    <div [innerHTML]="notFound"></div>
+                  </ng-template>
+                  <input type="hidden" name="orderby" class="form-control" id="make_id" formControlName="make_id"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="model_id">Model</label>
+              <select name="orderby" class="form-control" id="model_id" formControlName="model_id">
+                <option value="0" selected="selected">Select a model</option>
+                <option *ngFor="let model of modelList" [value]="model.id">{{model.name}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="year">Year</label>
+              <select name="orderby" class="form-control" id="year" formControlName="year">
+                <option value="0" selected="selected">Select a year</option>
+                <option *ngFor="let item of yearList" [value]="item">{{item}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="sub_model">Sub-model</label>
+              <select name="orderby" class="form-control" id="sub_model" formControlName="sub_model">
+                <option value="0" selected="selected">Select a sub-model</option>
+                <option *ngFor="let item of subModelsList" [value]="item">{{item}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="chassis_code">Chassis code</label>
+              <select name="orderby" class="form-control" id="chassis_code" formControlName="chassis_code">
+                <option value="0" selected="selected">Select a chassis code</option>
+                <option *ngFor="let item of chassisCodeList" [value]="item">{{item}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="engine_code">Engine code</label>
+              <select name="orderby" class="form-control" id="engine_code" formControlName="engine_code">
+               <option value="0" selected="selected">Select a engine code</option>
+               <option *ngFor="let item of engineCodeList" [value]="item">{{item}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="cc">CC</label>
+              <input class="form-control" type="text" name="cc" placeholder=" " id="cc" formControlName="cc">
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="power" class="d-flex">Power <span class="ml-auto">HP/kw</span></label>
+              <input class="form-control" type="text" name="power" placeholder=" " id="power" formControlName="power">
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="form-group">
+              <label for="body_type">Body type</label>
+              <select name="orderby" class="form-control" id="body_type" formControlName="body_type">
+                <option value="0" selected="selected">Select a body type</option>
+                <option *ngFor="let item of bodyTypeList" [value]="item">{{item}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-12 text-center mt-3">
+            <div class="col-md-6 col-lg-4 mx-auto p-0 px-sm-2">
+              <button class="btn btn-primary btn-block" [disabled]="!advanceSearchForm.valid" type="submit">Show me
+                {{productCount}} parts</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="banner-section">
+    <div class="container mb-5">
+      <!-- <swiper [config] ="bannerConfig" *ngIf="banners">
+        <div class="text-center border mt-5 mb-5" *ngFor="let banner of banners">
+          <img src="{{banner.image_url}}" alt="">
+        </div>
+      </swiper> -->
+
+      <swiper>
+        <div *ngFor="let blog of marketIntel" class="marketIntel">
+          <div class="card rounded-0 w-100">
+            <a *ngIf="blog.url === null" [routerLink]="['/market-intel', blog.blog_slug]">
+              <div class="card-image overflow-hidden">
+                <img src="{{blog.image_url}}" class="" alt="...">
+              </div>
+              <div class="card-body bg-light text-left text-dark">
+                <div class="card-title font-weight-bold title">{{blog.title}}</div>
+                <div class="card-text mb-4 desc">{{blog.short_description}}</div>
+              </div>
+            </a>
+
+            <a *ngIf="blog.url !== null" href="{{blog.url}}" target="_blank">
+              <div class="card-image overflow-hidden">
+                <img src="{{blog.image_url}}" class="" alt="...">
+              </div>
+              <div class="card-body bg-light text-left text-dark">
+                <div class="card-title font-weight-bold title">{{blog.title}}</div>
+                <div class="card-text mb-4 desc">{{blog.short_description}}</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </swiper>
+    </div>
+  </section>
+</main>
+<app-footer></app-footer>
+
+<ng-template #searchProductNotFound let-c="close" let-d="dismiss">
+    <div class="modal-header border-0 pb-0">
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body col-sm-8 col-12 text-center mx-auto">
+        <p class="my-5">Can’t find the part you’re looking for? Contact us on <a href="tel:+1300363935" class="text-primary">1300 363 735</a> and we’ll help source it for you.</p>
+        <!-- <button type="submit" class="btn btn-sm btn-primary mb-3 col-9" data-dismiss="modal">Save</button> -->
+        <button type="button" class="btn btn-sm btn-primary mb-3 mb-3 col-9" (click)="c('OK')">OK</button>
+    </div>
+</ng-template>
+
+<ng-template #VINSearchProductNotFound let-a="close" let-b="dismiss">
+    <div class="modal-header border-0 pb-0">
+        <button type="button" class="close" aria-label="Close" (click)="b('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body col-sm-8 col-12 text-center mx-auto">
+        <p class="my-5">Sorry, we can’t find your vehicle. We’re still updating the vehicle database, so either enter vehicle details or contact us on <a href="tel:+1300363935" class="text-primary">1300 363 735</a> and we’ll help source it for you.</p>
+        <!-- <button type="submit" class="btn btn-sm btn-primary mb-3 col-9" data-dismiss="modal">Save</button> -->
+        <button type="button" class="btn btn-sm btn-primary mb-3 mb-3 col-9" (click)="a('OK')">OK</button>
+    </div>
+</ng-template>

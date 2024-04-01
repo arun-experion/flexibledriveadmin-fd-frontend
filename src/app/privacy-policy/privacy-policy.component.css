@@ -1,0 +1,15 @@
+.disc-style li{
+    position: relative;
+    padding-left: 30px;
+}
+.disc-style li:before{
+   content:'';
+   height: 10px;
+   width: 10px;
+   border-radius: 10px;
+   border: 1px solid #ef5324;
+   position: absolute;
+   display: inline-block;
+   left: 10px;
+   top: 8px;
+}

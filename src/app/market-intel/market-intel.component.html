@@ -1,0 +1,17 @@
+<app-header></app-header>
+<main>
+    <div class="container mt-5 mb-5">
+        <div class="d-flex" *ngIf="blog">
+            <div class="col-xs-12 col-sm-12 col-md-3">
+                <img src="{{blog.image_url}}" alt="">
+            </div>
+            <div class="flex-grow-1 px-2">
+                <h2 class="font-weight-normal text-dark mb-3 d-sm-block">
+                    {{blog.title}}
+                </h2>
+                <div [innerHTML]="blog.description"></div>
+            </div>
+        </div>
+    </div>
+</main>
+<app-footer></app-footer>

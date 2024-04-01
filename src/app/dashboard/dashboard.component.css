@@ -1,0 +1,31 @@
+.stateList input,
+.stateList select {
+    flex-basis: 100%;
+    margin-bottom: 0;
+}
+
+.stateList select{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.stateList input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+::ng-deep .autocomplete-container .input-container input {
+  text-transform: uppercase;
+}
+.remove-vehicle-row-cross-btn:hover{
+    cursor: pointer;
+}
+.searchbutton i {
+    text-align: center;
+    margin: 0px auto;
+    display: block;
+    position: absolute;
+    top: 15px;
+    vertical-align: middle;
+    left: 17px;
+}

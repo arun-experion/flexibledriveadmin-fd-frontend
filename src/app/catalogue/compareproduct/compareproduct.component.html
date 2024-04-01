@@ -1,0 +1,376 @@
+<app-header></app-header>
+<main>
+    <div class="container">
+        <div class="row my-4">
+            <!--===========================================
+            =            Desktop & Tablet View            =
+            ============================================-->
+
+            <div *ngFor="let productDetail of compareProductList;"
+                [ngClass]="(compareProductList.length <= 2)?'col-md-6 col-sm-6 col-6 d-none d-md-block':'col-md-4 col-sm-4 col-4 d-none d-md-block'">
+                <div class="carousel slide row m-0" data-ride="carousel" data-interval="false">
+                    <div class="carousel-inner col-md-10 p-sm-1 rounded-0 img-thumbnail d-flex align-items-cente">
+                        <div *ngFor="let img of productDetail.images" class="carousel-item active">
+<!--                            <img src="{{img.image_url}}" alt="...">-->
+                            <div (mouseover)="showPreview()" (mouseout)="hidePreview()">
+                                <app-zoom [img]="img.image_url" [zoom]="3" [lenSize]="200"  class=" d-block w-100"  [divZoomed]="divZoomed" ></app-zoom>
+                            </div>
+                        </div>
+
+                        <div *ngIf="!productDetail.images || productDetail.images.length === 0"
+                            class="carousel-item active d-flex justify-content-center align-items-cente">
+                            <img src="assets/images/footer-logo.png" class="rounded-circle footerLogPlaceHolder">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4 d-flex flex-row">
+                    <div [ngClass]="{'low-opacity': isLow}"  #divZoomed class="img-zoom-result"></div>
+                    <div class="col-sm-6">
+                        Part Number
+                    </div>
+                    <div class="col-sm-6 font-weight-bold">
+                        {{productDetail.company_sku}}
+                    </div>
+
+                    <div class="col-sm-6">
+                        Part
+                    </div>
+                    <div class="col-sm-6 font-weight-bold">
+                        {{productDetail?.brand?.name}} {{productDetail?.name}}
+                    </div>
+
+                    <div class="col-sm-6">
+                        Vehicle
+                    </div>
+                    <div class="col-sm-6 font-weight-bold">
+                        {{productDetail?.make?.name}} {{productDetail?.vehicle?.year_range}}
+                        {{productDetail?.model?.name}}
+                    </div>
+
+                    <div class="col-sm-6" *ngIf="isPriceVisible === true">
+                        Price Net
+                    </div>
+                    <div class="col-sm-6 font-weight-bold" *ngIf="isPriceVisible === true">
+                        ${{productDetail.price_nett}}
+                    </div>
+
+                    <div class="col-sm-6" *ngIf="isPriceVisible === true">
+                        Price Retail
+                    </div>
+                    <div class="col-sm-6 font-weight-bold" *ngIf="isPriceVisible === true">
+                        ${{productDetail.price_retail}}
+                    </div>
+                    <div class="col-sm-6">
+                        Fiting Position
+                    </div>
+                    <div class="col-sm-6">
+                        {{productDetail.fitting_position}}
+                    </div>
+
+                    <div class="col-sm-6">
+                        Brake System
+                    </div>
+                    <div class="col-sm-6">
+                        {{productDetail.brake_system}}
+                    </div>
+                    <div class="col-sm-6">
+                        Length
+                    </div>
+                    <div class="col-sm-6">
+                        {{productDetail.length}}
+                    </div>
+                    <div class="col-sm-6">
+                        Height
+                    </div>
+                    <div class="col-sm-6">
+                        {{productDetail.height}}
+                    </div>
+                    <div class="col-sm-6">
+                        Thickness
+                    </div>
+                    <div class="col-sm-6">
+                        {{productDetail.thickness}}
+                    </div>
+                    <div class="col-sm-6">
+                        Weight (G)
+                    </div>
+                    <div class="col-sm-6">
+                        {{productDetail.weight}}
+                    </div>
+                </div>
+				<div class="row d-flex flex-row" *ngFor="let criteria of productDetail.criteria">
+					<div class="col-sm-6">
+						{{criteria.criteria_name}}
+					</div>
+					<div class="col-sm-6">
+						{{criteria.criteria_value}}
+					</div>
+				</div>
+                <div class="mt-4 d-flex flex-row">
+                    <div class="quantity-block d-inline-block ml-0 mr-3">
+                        <div class="input-group m-0">
+                            <button type="button" class="quantity-minus btn btn-lg btn-gray btn-icon" data-type="minus"
+                                data-field="" (click)="quantityDecrement(productDetail)"><i
+                                    class="flaticon-minus-symbol"></i></button>
+                            <input type="text" name="quantity" class="form-control quantity-input-number"
+                                value="{{productDetail.quantity}}" min="1" max="100">
+                            <button type="button" class="quantity-plus btn btn-lg btn-gray btn-icon" data-type="plus"
+                                data-field="" (click)="quantityIncrement(productDetail)"><i
+                                    class="flaticon-plus-symbol"></i></button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-order" (click)="addToCart(productDetail);">Add to
+                        Order</button>
+                </div>
+            </div>
+
+
+            <!--====  End of Desktop & Tablet View  ====-->
+
+            <!--=================================
+            =            Mobile View            =
+            ==================================-->
+            <div class="col-xs-12 col-sm-12 d-md-none mobielViewCompare">
+                <table class="table table-bordered">
+                    <tr>
+                        <th> </th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            <img *ngIf="compareProductList[0].images && compareProductList[0].images.length === 0"
+                                src="assets/images/footer-logo.png" class="rounded-circle footerLogPlaceHolder">
+                            <img *ngIf="compareProductList[0].images && compareProductList[0].images.length !== 0"
+                                src="{{compareProductList[0].images[0].image_url}}"
+                                class="rounded-circle footerLogPlaceHolder">
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            <img *ngIf="compareProductList[1].images && compareProductList[1].images.length === 0"
+                                src="assets/images/footer-logo.png" class="rounded-circle footerLogPlaceHolder">
+                            <img *ngIf="compareProductList[1].images && compareProductList[1].images.length !== 0"
+                                src="{{compareProductList[1].images[0].image_url}}"
+                                class="rounded-circle footerLogPlaceHolder">
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            <img *ngIf="compareProductList[2].images && compareProductList[2].images.length === 0"
+                                src="assets/images/footer-logo.png" class="rounded-circle footerLogPlaceHolder">
+                            <img *ngIf="compareProductList[2].images && compareProductList[2].images.length !== 0"
+                                src="{{compareProductList[2].images[0].image_url}}"
+                                class="rounded-circle footerLogPlaceHolder">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Part Number</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.company_sku}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.company_sku}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.company_sku}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Part</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.brand?.name}}<br />
+                            <span class="text-muted">
+                                {{compareProductList[0]?.name}}
+                            </span>
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.brand?.name}}<br />
+                            <span class="text-muted">
+                                {{compareProductList[1]?.name}}
+                            </span>
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.brand?.name}}<br />
+                            <span class="text-muted">{{compareProductList[2]?.name}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Vehicle</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.make?.name}} {{compareProductList[0]?.vehicle?.year_range}}
+                            {{compareProductList[0]?.model?.name}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.make?.name}} {{compareProductList[1]?.vehicle?.year_range}}
+                            {{compareProductList[1]?.model?.name}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.make?.name}} {{compareProductList[2]?.vehicle?.year_range}}
+                            {{compareProductList[2]?.model?.name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Price Net</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            ${{compareProductList[0]?.price_nett}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            ${{compareProductList[1]?.price_nett}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            ${{compareProductList[2]?.price_nett}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Price Retail</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            ${{compareProductList[0]?.price_retail}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            ${{compareProductList[1]?.price_retail}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            ${{compareProductList[2]?.price_retail}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Fiting Position</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.fitting_position}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.fitting_position}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.fitting_position}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Brake System</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.brake_system}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.brake_system}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.brake_system}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Length</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.length}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.length}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.length}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Height</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.height}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.height}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.height}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Thickness</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.thickness}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.thickness}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.thickness}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th nowrap>Weight (G)</th>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
+                            {{compareProductList[0]?.weight}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
+                            {{compareProductList[1]?.weight}}
+                        </td>
+                        <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
+                            {{compareProductList[2]?.weight}}
+                        </td>
+                    </tr>
+					<tr *ngFor="let criteria of compareProductList[0].criteria">
+						<th nowrap>{{criteria.criteria_name}}</th>
+						<td>{{criteria.criteria_value}}</td>
+					</tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                            <div class="quantity-block d-inline-block ml-0 mb-3 w-100">
+                                <div class="input-group m-0 w-100">
+                                    <button type="button" class="quantity-minus btn btn-lg btn-gray btn-icon"
+                                        data-type="minus" data-field=""
+                                        (click)="quantityDecrement(compareProductList[0])"><i
+                                            class="flaticon-minus-symbol"></i></button>
+                                    <input type="text" name="quantity" class="form-control quantity-input-number"
+                                        value="{{compareProductList[0].quantity}}" min="1" max="100">
+                                    <button type="button" class="quantity-plus btn btn-lg btn-gray btn-icon"
+                                        data-type="plus" data-field=""
+                                        (click)="quantityIncrement(compareProductList[0])"><i
+                                            class="flaticon-plus-symbol"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-order w-100"
+                                (click)="addToCart(compareProductList[0]);">Add to
+                                Order</button>
+                        </td>
+                        <td>
+                            <div class="quantity-block d-inline-block ml-0 mb-3 w-100">
+                                <div class="input-group m-0 w-100">
+                                    <button type="button" class="quantity-minus btn btn-lg btn-gray btn-icon"
+                                        data-type="minus" data-field=""
+                                        (click)="quantityDecrement(compareProductList[1])"><i
+                                            class="flaticon-minus-symbol"></i></button>
+<!--                                    <input type="text" name="quantity" class="form-control quantity-input-number"-->
+<!--                                        value="{{compareProductList[1].quantity}}" min="1" max="100">-->
+                                    <button type="button" class="quantity-plus btn btn-lg btn-gray btn-icon"
+                                        data-type="plus" data-field=""
+                                        (click)="quantityIncrement(compareProductList[1])"><i
+                                            class="flaticon-plus-symbol"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-order w-100"
+                                (click)="addToCart(compareProductList[1]);">Add to
+                                Order</button>
+                        </td>
+                        <td>
+                            <div class="quantity-block d-inline-block ml-0 mb-3 w-100">
+                                <div class="input-group m-0 w-100">
+                                    <button type="button" class="quantity-minus btn btn-lg btn-gray btn-icon"
+                                        data-type="minus" data-field=""
+                                        (click)="quantityDecrement(compareProductList[2])"><i
+                                            class="flaticon-minus-symbol"></i></button>
+                                    <input type="text" name="quantity" class="form-control quantity-input-number"
+                                        value="" min="1" max="100">
+                                    <button type="button" class="quantity-plus btn btn-lg btn-gray btn-icon"
+                                        data-type="plus" data-field=""
+                                        (click)="quantityIncrement(compareProductList[2])"><i
+                                            class="flaticon-plus-symbol"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-order w-100"
+                                (click)="addToCart(compareProductList[2]);">Add to
+                                Order</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--====  End of Mobile View  ====-->
+
+        </div>
+        <div class="my-5 text-center">
+            <button type="button" (click)="back()" class="btn btn-outline-secondary btn-order btn-long">Back to
+                Search</button>
+        </div>
+    </div>
+</main>
+<app-footer></app-footer>

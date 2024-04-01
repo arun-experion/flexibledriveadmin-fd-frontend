@@ -1,0 +1,103 @@
+<hr />
+<div class="container">
+    <h3 class="text-dark">Associated Parts</h3>
+
+    <div class="overflow-auto mb-3 pr-3" style="max-height: 350px;">
+        <table class="table associatedParts">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="2">Part Number(s) & Name</th>
+                    <th scope="col">Vehicle</th>
+                    <th scope="col" *ngIf="isPriceVisible == true">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Delivered By</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let part of parts">
+                    <td>
+                        <div class="row">
+                            <a href="/productdetails/{{part.id}}" class="col d-flex align-items-start" style="height: 50px;">
+                                <img *ngIf="part.images.length != 0" src="{{part.images[0].image_url}}" alt=""
+                                    class="footerLogPlaceHolder p-0 mr-3">
+
+                                <img *ngIf="part.images && part.images.length == 0" src="assets/images/footer-logo.png"
+                                    alt="" class="footerLogPlaceHolder p-0 mr-3">
+                                <div>
+                                    <div class="font-weight-bold">{{part.company_sku}}</div>
+                                    <div *ngIf="part.cross_reference_numbers != ''">or</div>
+                                    <div *ngIf="part.cross_reference_numbers != ''">{{part.cross_reference_numbers}}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="font-weight-bold">{{part.brand.name}}</div>
+                        <div>{{part.description}}</div>
+                    </td>
+                    <td>
+                        <div>{{part?.vehicles[0]?.make?.name}}</div>
+                        <div>{{part?.vehicles[0]?.model?.name}} {{part?.vehicles[0]?.year_range}}</div>
+                        <div *ngIf="part.vehicles.length > 1">...</div>
+                    </td>
+                    <td *ngIf="isPriceVisible == true">
+                        <div>
+                            <div class="font-weight-bold">
+                                Nett: ${{part.price_nett}}
+                            </div>
+                            <div>
+                                Retail: ${{part.price_nett}}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="body-col delivered-body-col">
+                            <ul class="list-unstyled">
+                                <li class="text-success" *ngIf="part.qty !== 0">
+                                    In stock - {{part.qty}} items
+                                </li>
+                                <li class="text-danger" *ngIf="part.qty === 0">
+                                    Back order
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td>PM 19/12/2019</td>
+                    <td>
+                        <div class="body-col compare-body-col">
+                            <div class="compare-block">
+                                <div class="custom-control custom-checkbox compare-checkbox"
+                                    (click)="onCompareChange(part)">
+                                    <input type="checkbox" attr="product" id="compare_{{part.id}}"
+                                        class="custom-control-input" value="1"
+                                        [checked]="part.is_compare == 0 ? false : true">
+                                    <label class="custom-control-label" for="compare1_{{part.id}}">Compare</label>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="quantity-block mb-3">
+                            <div class="input-group mt-0">
+                                <button type="button" class="quantity-minus btn btn-gray btn-icon" data-type="minus"
+                                    data-field="" (click)="quantityDecrement(part)"><i
+                                        class="flaticon-minus-symbol"></i></button>
+                                <input type="text" name="quantity"
+                                    class="form-control quantity-input-number" value="{{part.quantity}}" min="1"
+                                    max="100">
+                                <button type="button" class="quantity-plus btn btn-gray btn-icon" data-type="plus"
+                                    data-field="" (click)="quantityIncrement(part)"><i
+                                        class="flaticon-plus-symbol"></i></button>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-order w-100"
+                                (click)="addToCart(part);">Order</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

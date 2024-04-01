@@ -1,0 +1,26 @@
+.product-list ul li {
+    word-break: break-word;
+}
+
+.product-list .placeholder{
+    height: 50px;
+    width: 100%;
+}
+
+.product-list .placeholder img{
+    opacity: 0.5;
+}
+
+
+.partsTable th{
+    color: #818181;
+    border: 0;
+}
+
+.partsTable {
+    font-size: 14px;
+}
+
+.cur-pointer {
+	cursor: pointer;
+}

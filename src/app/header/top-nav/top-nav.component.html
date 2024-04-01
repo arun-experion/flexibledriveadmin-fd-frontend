@@ -1,0 +1,47 @@
+<nav class="top-navbar navbar px-0">
+  <div class="container">
+    <a class="navbar-brand" href="#"><img src="assets/images/logo-colour.png"></a>
+    <div class="right-side-block flex-column ml-auto d-flex align-items-center">
+      <div class="top-block d-flex justify-content-end w-100">
+        <div class="navbar-block phone-block">
+          <a href="tel:+1300363935">
+            <i class="flaticon-phone-call"></i> 1300 363 735
+          </a>
+        </div>
+        <div class="navbar-block showprice-block">
+
+          <div class="custom-control custom-switch rightside-switch">
+            <input type="checkbox" class="custom-control-input" id="priceSwitch" [disabled]="isPriceChangeDisabled" [checked]="isShowPriceChecked" (change)="priceToggle($event)">
+            <label class="custom-control-label" for="priceSwitch">Show Prices</label>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-block d-flex align-items-center">
+        <div class="navbar-block user-account-block">
+          <div class="media align-items-center">
+            <a [routerLink]="['/profile']" style="overflow: hidden;height: 30px; width: 30px; margin-right: 10px;">
+              <img *ngIf="currentUser.image_url !== null" src="{{currentUser?.image_url}}" class="rounded-circle mr-3"
+                alt="user-avatar" style="min-width: 100%; min-height: 100%;">
+              <img *ngIf="currentUser.image_url == null || currentUser.image_url == ''" src="assets/images/profile_place_holder.png"
+                style="opacity: 0.5; filter: sepia(0.7); min-width: 100%; min-height: 100%;" class="rounded-circle mr-3" alt="user-avatar">
+            </a>
+            <div class="media-body">
+              <div>Welcome, <a [routerLink]="['/profile']"
+                  class="font-weight-bold text-primary">{{currentUser.first_name}} {{currentUser.last_name}}</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="navbar-block shopping-cart-block dropdown">
+          <a (click)="showCartoverlay = !showCartoverlay"
+            class="font-weight-bold text-primary media align-items-center cartMenuDropdown" role="button"
+            id="cartMenuDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            style="cursor: pointer;"><i class="flaticon-shopping-cart mr-2"></i> Your Order ({{cartItemCount}})</a>
+          <app-cartoverlay [(visible)]="showCartoverlay"></app-cartoverlay>
+        </div>
+      </div>
+    </div>
+    <div class="mobile-nav-panel"></div>
+    <button id="mobile-nav-toggle" class="mobile-nav-toggle flaticon-menu-1" type="button"
+      title="Open Menu Toggle"></button>
+  </div>
+</nav>
