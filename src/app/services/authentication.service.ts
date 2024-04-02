@@ -28,5 +28,8 @@ export class AuthenticationService {
     logout() {
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
+         // clear whole local storage
+         localStorage.clear();
+
     }
 }

@@ -500,7 +500,7 @@ export class OrderComponent implements OnInit {
   addToCart = (payload) => {
     this.$apiSer.post(`${CARTAPI}/add/product`, payload).subscribe(res => {
       if (res.success) {
-        this.toastr.success(`${payload.product_nr} is added in the cart.`);
+        this.toastr.success(`${payload.company_sku} is added in the cart.`);
       } else {
         this.toastr.warning(`${res.message}`);
       }

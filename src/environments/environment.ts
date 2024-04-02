@@ -4,10 +4,11 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:8000/api'
+  // baseUrl: 'http://localhost:8000/api'
   // baseUrl: 'http://13.55.151.224/fd-backend/public/api' http://13.55.151.224/
   //  baseUrl: 'https://ecat.flexibledrive.com.au/fd-backend/public/api'
   // baseUrl: 'localhost/fd-backend/api'
+  baseUrl: 'http://localhost:8000/api'
 
 };
 

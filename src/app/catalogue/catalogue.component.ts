@@ -3,6 +3,8 @@ import { ProductlistService } from 'src/app/services/productlist.service';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../services/api.service';
+import { LocalStorageService } from '../local-storage.service';
+
 import {
   PRODUCTSAPI,
   CATEGORIESAPI,
@@ -19,6 +21,7 @@ import { ShowPriceService } from '../services/show-price.service';
 import { CompareService } from '../services/compare.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Product } from '../product.model';
 
 @Component({
   selector: 'app-catalogue',
@@ -33,7 +36,7 @@ export class CatalogueComponent implements OnInit {
   compareProductList: any = [];
   compareProductListId: any = [];
   isNotAllowedCompare = false;
-  perPageItemCount = 20;
+  perPageItemCount = 25;
   currentIndex = 1;
   nextPageUrl = '';
   brandId = 0;
@@ -45,6 +48,16 @@ export class CatalogueComponent implements OnInit {
   currentUser: any;
   userStateQty = 0;
   closeResult = '';
+  searchResponse:any;
+  regoVINKey : any;
+  regoVINSearch : any;
+  resultData : any;
+  brandsList : any = [];
+  categoryList : any = [];
+  fittingPositionList : any = [];
+  filteredProductData : any = [];
+  resultDataArr : any;
+
 
   @ViewChild('catalogueBackOrderModal', { static: false }) catalogueBackOrderModal;
 
@@ -81,7 +94,8 @@ export class CatalogueComponent implements OnInit {
     private comSer: CompareService,
     private authSer: AuthenticationService,
     private modal: NgbModal,
-    private router: Router
+    private router: Router,
+    private localStorageService: LocalStorageService
   ) {
     this.route.queryParams.subscribe(params => {
       this.queryParams = params;
@@ -93,10 +107,10 @@ export class CatalogueComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getBrands();
-    this.getCategory();
+    // this.getBrands();
+    // this.getCategory();
     this.getAllProducts();
-    this.getFittingPosition();
+    // this.getFittingPosition();
 
     this.showPrice.setPriceChangeDisabled(false);
 
@@ -178,7 +192,7 @@ export class CatalogueComponent implements OnInit {
               });
               this.productData.push(objProductRow);
             });
-
+            
             // this.compareProductList = this.Productlist.compareProductList;
             this.Productlist.updateProductList(this.productData);
           } else {
@@ -238,6 +252,10 @@ export class CatalogueComponent implements OnInit {
     this.brandId = BrandID;
     this.categoryId = CatId;
     this.productData = [];
+    this.brandsList = [];
+    this.categoryList = [];
+    this.fittingPositionList = [];
+    this.filteredProductData = [];
 
     const queryParamObj = Object.assign({}, this.queryParams);
 
@@ -246,9 +264,103 @@ export class CatalogueComponent implements OnInit {
     queryParamObj.page = 1;
     queryParamObj.per_page = 20;
     queryParamObj.product_nr = queryParamObj.product_nr ? queryParamObj.product_nr.trim() : '';
+    
+    if(this.queryParams.rego_number !== '' && this.queryParams.state !== '' && this.queryParams.vin_number !== '' && this.queryParams.rego_number !== undefined && this.queryParams.state !== undefined && this.queryParams.vin_number !== undefined){
+      this.regoVINSearch = 'rego_state_vin';
+      this.regoVINKey = 'rego_vin_' + this.queryParams.rego_number +'_'+ this.queryParams.state +'_'+ this.queryParams.vin_number;
+    }
+    else if(this.queryParams.rego_number !== '' && this.queryParams.state !== '' && this.queryParams.vin_number === '' && this.queryParams.rego_number !== undefined && this.queryParams.state !== undefined && this.queryParams.vin_number !== undefined){
+      this.regoVINSearch = 'rego_state';
+      this.regoVINKey = 'rego_vin_' + this.queryParams.rego_number +'_'+ this.queryParams.state;
+    }
+    else if(this.queryParams.rego_number === '' && this.queryParams.state === '' && this.queryParams.vin_number !== '' && this.queryParams.rego_number !== undefined && this.queryParams.state !== undefined && this.queryParams.vin_number !== undefined){
+      this.regoVINSearch = 'vin';
+      this.regoVINKey = 'rego_vin_' + this.queryParams.vin_number;
+    } else{
+      this.regoVINKey = '';
+    }
 
-    const queryString = Util.objectToQueryString(queryParamObj);
-    this.$apiSer.get(`${this.productAPI}?${queryString}`)
+    const data = this.localStorageService.getItem(this.regoVINKey);
+    const result =  data ? JSON.parse(data) : null;
+    this.resultData = result;
+    
+    if(this.resultData !== null && this.regoVINKey !== '') {
+      
+      this.currentPage = result.data.data.current_page;
+      this.lastPage = result.data.data.last_page;
+      this.nextPageUrl = result.data.data.next_page_url;
+      this.productData = result.data.data.data || result.data.data.data;
+      this.productData.forEach(objProductRow => {
+
+        if(this.productData.length){
+          objProductRow.brand.product_count = this.productData.length;
+        }
+        const fittingPosiionArr = {
+          'fitting_position' : objProductRow.fitting_position,
+          'product_count' : 0,
+        }
+        if(fittingPosiionArr.fitting_position !== ''){
+          this.fittingPositionList.push(fittingPosiionArr);
+        }
+        this.brandsList.push(objProductRow.brand);
+        if(objProductRow.categories){
+          if(objProductRow.categories.length > 0){
+            delete objProductRow.categories[0].pivot;
+            objProductRow.categories[0].product_count = 0;
+            const newArray = objProductRow.categories[0];
+            this.categoryList.push(newArray);
+          }              
+        }    
+
+        // check if fitting position filter
+        if(this.queryParams.fitting_position !== undefined){
+          if(this.queryParams.fitting_position !== '' && this.queryParams.fitting_position !== 0 && objProductRow.fitting_position !== this.queryParams.fitting_position){
+            objProductRow = undefined;
+          }
+        }
+        if(this.brandId !== undefined){
+          if(this.brandId !== 0 && objProductRow.brand.id !== this.brandId){
+            objProductRow = undefined;
+          }
+        }
+        if(this.categoryId !== undefined){
+          if(this.categoryId !== 0 && objProductRow.categories[0].id !== this.categoryId){
+            objProductRow = undefined;
+          }
+        }
+
+        if( objProductRow !== undefined){
+          const indexInCart = this.cartItemsIds.indexOf(objProductRow.id);
+          const indexInCompareList = this.compareProductListId.indexOf(objProductRow.id);
+          objProductRow.is_compare = (indexInCompareList !== -1) ? 1 : 0;
+          objProductRow.quantity = (indexInCart !== -1) ? this.casrtItemQty[indexInCart] : 1;
+          objProductRow.addToCart = (indexInCart !== -1) ? 1 : 0;
+          objProductRow.quantityCurrentUserState = []
+          objProductRow.currentUserStateQty = 0
+          objProductRow.isBackOrderModalShown = false;
+          objProductRow.qty_with_location.forEach(branch => {
+            if (this.state[this.currentUser.state].includes(branch.branch.name) && branch.qty != 0 ) {
+              objProductRow.quantityCurrentUserState.push({'state': branch.branch.name, 'qty': branch.qty} );
+              objProductRow.currentUserStateQty += branch.qty;
+            }
+          });
+          objProductRow.brand.product_count = this.productData.length;
+          this.filteredProductData.push(objProductRow);
+        }
+      });
+      this.brandData = this.removeDuplicatesAndCountprocessArrays(this.brandsList);
+      this.categoryData = this.removeDuplicatesAndCountprocessArrays(this.categoryList);
+      this.positionData = this.removeDuplicatesAndCountprocessArrays(this.fittingPositionList);
+      // const Criteria = objProductRow
+
+      this.Productlist.updateProductList(this.filteredProductData[0]);
+      this.productData = this.filteredProductData;
+      this.isProductLoading = false;
+      window.scrollTo(0, 0);
+    }else {
+
+      const queryString = Util.objectToQueryString(queryParamObj);
+      this.$apiSer.get(`${this.productAPI}?${queryString}`)
       .subscribe(res => {
         if (res.success) {
           this.currentPage = res.data.current_page;
@@ -256,27 +368,95 @@ export class CatalogueComponent implements OnInit {
           this.nextPageUrl = res.data.next_page_url;
           this.productData = res.data.data || res.data;
           this.productData.forEach(objProductRow => {
-            const indexInCart = this.cartItemsIds.indexOf(objProductRow.id);
-            const indexInCompareList = this.compareProductListId.indexOf(objProductRow.id);
-            objProductRow.is_compare = (indexInCompareList !== -1) ? 1 : 0;
-            objProductRow.quantity = (indexInCart !== -1) ? this.casrtItemQty[indexInCart] : 1;
-            objProductRow.addToCart = (indexInCart !== -1) ? 1 : 0;
-            objProductRow.quantityCurrentUserState = []
-            objProductRow.currentUserStateQty = 0
-            objProductRow.isBackOrderModalShown = false;
-            objProductRow.qty_with_location.forEach(branch => {
-              if (this.state[this.currentUser.state].includes(branch.branch.name) && branch.qty != 0 ) {
-                objProductRow.quantityCurrentUserState.push({'state': branch.branch.name, 'qty': branch.qty} );
-                objProductRow.currentUserStateQty += branch.qty;
+
+            if(this.productData.length){
+              objProductRow.brand.product_count = this.productData.length;
+            }
+            const fittingPosiionArr = {
+              'fitting_position' : objProductRow.fitting_position,
+              'product_count' : 0,
+            }
+            if(fittingPosiionArr.fitting_position !== ''){
+              this.fittingPositionList.push(fittingPosiionArr);
+            }
+            this.brandsList.push(objProductRow.brand);
+            if(objProductRow.categories){
+              if(objProductRow.categories.length > 0){
+                delete objProductRow.categories[0].pivot;
+                objProductRow.categories[0].product_count = 0;
+                const newArray = objProductRow.categories[0];
+                this.categoryList.push(newArray);
+              }              
+            }    
+    
+            // check if fitting position filter
+            if(this.queryParams.fitting_position !== undefined){
+              if(this.queryParams.fitting_position !== '' && this.queryParams.fitting_position !== 0 && objProductRow.fitting_position !== this.queryParams.fitting_position){
+                objProductRow = undefined;
               }
-            });
+            }
+            if(this.brandId !== undefined){
+              if(this.brandId !== 0 && objProductRow.brand.id !== this.brandId){
+                objProductRow = undefined;
+              }
+            }
+            if(this.categoryId !== undefined){
+              if(this.categoryId !== 0 && objProductRow.categories[0].id !== this.categoryId){
+                objProductRow = undefined;
+              }
+            }
+    
+            if( objProductRow !== undefined){
+              const indexInCart = this.cartItemsIds.indexOf(objProductRow.id);
+              const indexInCompareList = this.compareProductListId.indexOf(objProductRow.id);
+              objProductRow.is_compare = (indexInCompareList !== -1) ? 1 : 0;
+              objProductRow.quantity = (indexInCart !== -1) ? this.casrtItemQty[indexInCart] : 1;
+              objProductRow.addToCart = (indexInCart !== -1) ? 1 : 0;
+              objProductRow.quantityCurrentUserState = []
+              objProductRow.currentUserStateQty = 0
+              objProductRow.isBackOrderModalShown = false;
+              objProductRow.qty_with_location.forEach(branch => {
+                if (this.state[this.currentUser.state].includes(branch.branch.name) && branch.qty != 0 ) {
+                  objProductRow.quantityCurrentUserState.push({'state': branch.branch.name, 'qty': branch.qty} );
+                  objProductRow.currentUserStateQty += branch.qty;
+                }
+              }); 
+              objProductRow.brand.product_count = this.productData.length;
+              this.filteredProductData.push(objProductRow);             
+            }
           });
-          this.Productlist.updateProductList(this.productData);
+          this.Productlist.updateProductList(this.productData);  
+          this.searchResponse = {
+            'data' : res,
+          }
+          if(this.regoVINKey !== ''){
+            this.brandData = this.removeDuplicatesAndCountprocessArrays(this.brandsList);        
+            this.categoryData = this.removeDuplicatesAndCountprocessArrays(this.categoryList);        
+            this.positionData = this.removeDuplicatesAndCountprocessArrays(this.fittingPositionList);
+            if(this.regoVINKey !== ''){
+              this.localStorageService.setItem(this.regoVINKey, JSON.stringify(this.searchResponse));
+            }            
+          }  else{
+            if(this.brandData && this.brandData.length === 0){
+              this.getBrands();
+            }
+            if(this.categoryData && this.categoryData.length === 0){
+              this.getCategory();
+            }
+            if(this.positionData && this.positionData.length === 0){
+              this.getFittingPosition();
+            }
+            
+            
+            
+          }        
         }
+        this.isProductLoading = false;
       }, error => console.log(error), () => {
         this.isProductLoading = false;
         window.scrollTo(0, 0);
       });
+    }
   }
 
   onCompareChange(part) {
@@ -296,7 +476,7 @@ export class CatalogueComponent implements OnInit {
       if (res.success) {
         objProduct.addToCart = 1;
         this.Productlist.updateProductList(this.productData);
-        this.toastr.success(`${objProduct.product_nr} is added in the cart.`);
+        this.toastr.success(`${objProduct.company_sku} is added in the cart.`);
       } else {
         this.toastr.warning(`${res.message}`);
       }
@@ -353,8 +533,59 @@ export class CatalogueComponent implements OnInit {
 
   filterPosition(position: string) {
     this.queryParams = { fitting_position: position, ...this.queryParams };
+    this.queryParams.fitting_position = position; 
     this.getAllProducts();
     // this.router.navigate(['/catalogue'], {queryParams: param});
     // this.ngOnInit();
   }
+
+  removeDuplicateArrays<T>(arrays: T[][]): T[][] {
+    const uniqueArrays = arrays.filter((array, index, self) =>
+      index === self.findIndex((arr) => this.areArraysEqual(arr, array))
+    );
+    return uniqueArrays;
+  }
+  
+  // Utility function to check if two arrays are equal
+  areArraysEqual<T>(arr1: T[], arr2: T[]): boolean {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+  
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+  
+    return true;
+  }
+
+  removeDuplicatesAndCountprocessArrays(arr: object[]): object[] {
+
+    const map = new Map();
+  
+    arr.forEach(item => {
+      const key = JSON.stringify(item);
+      
+      if (map.has(key)) {
+        const dupItem = map.get(key);
+        dupItem.product_count++;
+      } else {
+        item['product_count'] = 1; 
+        map.set(key, item);  
+      }
+    });
+  
+    return Array.from(map.values());
+  }
+
+  // Clear Filter
+  clearFilter() {
+    if(this.queryParams.fitting_position) {
+      delete this.queryParams.fitting_position;
+    }    
+    this.getAllProducts();
+  }
+  
 }

@@ -1,0 +1,10 @@
+# delete files
+sudo rm index.html
+sudo rm *.js
+sudo rm *.css
+
+# deploy latest files
+sudo cp fd-front-end/dist/index.html . 
+sudo cp fd-front-end/dist/*.js . 
+sudo cp fd-front-end/dist/*.css . 
+

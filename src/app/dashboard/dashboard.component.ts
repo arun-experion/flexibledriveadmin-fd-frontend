@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../services/api.service';
+import { LocalStorageService } from '../local-storage.service';
+
 import {
   MAKESAPI,
   MODELSAPI,
@@ -58,6 +60,10 @@ export class DashboardComponent implements OnInit {
   banners: any;
   keyword = 'name';
   autofilData = [];
+  searchCriteria: any;
+  regoVINKey : any;
+  searchResponse : any;
+  regoVINSearch : any;
 
   private makeAPIRequest: Subscription;
   private inputsAPIRequest: Subscription;
@@ -80,7 +86,9 @@ export class DashboardComponent implements OnInit {
     private $apiSer: ApiService,
     private toastr: ToastrService,
     private modalService: NgbModal,
+    private localStorageService: LocalStorageService,
   ) {
+
     config.backdrop = 'static';
     config.keyboard = false;
 
@@ -181,28 +189,74 @@ export class DashboardComponent implements OnInit {
   }
 
   onVinSearchFormSubmit() {
-    if (this.registrationOrVINSearchForm.valid) {
-      // VINSearchProductNotFound
-      const queryParam = Util.objectToQueryString(this.registrationOrVINSearchForm.value);
-      const coutURL = `${this.productsAPI}${this.countAPI}?${queryParam}`;
+    const queryParam = Util.objectToQueryString(this.registrationOrVINSearchForm.value);
 
-      this.$apiSer.get(`${coutURL}`).subscribe(res => {
-        try {
-          const { success, message, data: { count } } = res;
-          if (success) {
-            if (count !== 0) {
-              this.router.navigate(['/catalogue'], { queryParams: this.registrationOrVINSearchForm.value });
-            } else {
-              this.modalService.dismissAll();
-              this.modalService.open(this.VINSearchProductNotFound);
-            }
-          } else {
-            this.toastr.warning(message);
-          }
-        } catch (error) {
-          this.toastr.warning(`Something went wrong.`);
+    if(this.registrationOrVINSearchForm.value.rego_number !== '' && this.registrationOrVINSearchForm.value.state !== '' && this.registrationOrVINSearchForm.value.vin_number !== ''){
+      this.regoVINSearch = 'rego_state_vin';
+      this.regoVINKey = 'rego_vin_' + this.registrationOrVINSearchForm.value.rego_number +'_'+ this.registrationOrVINSearchForm.value.state +'_'+ this.registrationOrVINSearchForm.value.vin_number;
+    } else if(this.registrationOrVINSearchForm.value.rego_number !== '' && this.registrationOrVINSearchForm.value.state !== '' && this.registrationOrVINSearchForm.value.vin_number === ''){
+      this.regoVINSearch = 'rego_state';
+      this.regoVINKey = 'rego_vin_' + this.registrationOrVINSearchForm.value.rego_number +'_'+ this.registrationOrVINSearchForm.value.state;
+    } else if(this.registrationOrVINSearchForm.value.rego_number === '' && this.registrationOrVINSearchForm.value.state === '' && this.registrationOrVINSearchForm.value.vin_number !== ''){
+      this.regoVINSearch = 'vin';
+      this.regoVINKey = 'rego_vin_' + this.registrationOrVINSearchForm.value.vin_number;
+    } else{
+      this.regoVINSearch = '';
+      this.regoVINKey = '';
+    }
+    if(this.regoVINKey !== ''){
+      this.localStorageService.setItem('regoVINKey', this.regoVINKey);  
+    }      
+    const data = this.localStorageService.getItem(this.regoVINKey);
+    const result =  data ? JSON.parse(data) : null;
+    if(result !== null && this.regoVINKey !== '') {
+      if(result.data.data.data) {
+        if (result.data.data.data.length !== 0) {
+          this.router.navigate(['/catalogue'], { queryParams: this.registrationOrVINSearchForm.value });
+        } else {
+          this.modalService.dismissAll();
+          this.modalService.open(this.VINSearchProductNotFound);
         }
-      }, error => console.log(error), () => { });
+      }
+      else {
+        this.toastr.warning(result.message);
+      }
+
+    } else{
+
+    
+      // return false;
+      if (this.registrationOrVINSearchForm.valid) {
+      // VINSearchProductNotFound
+        const queryParam = Util.objectToQueryString(this.registrationOrVINSearchForm.value);
+        const coutURL = `${this.productsAPI}?${queryParam}`;
+
+        this.$apiSer.get(`${coutURL}`).subscribe(res => {
+          try {
+            const { success, message, data: { count } } = res;
+
+            this.searchResponse = {
+              'data' : res,
+              'message' : message,
+            } 
+            if(this.regoVINKey !== ''){
+              this.localStorageService.setItem(this.regoVINKey, JSON.stringify(this.searchResponse));
+            }
+            if (success) {
+              if (res.data.total !== 0) {
+                this.router.navigate(['/catalogue'], { queryParams: this.registrationOrVINSearchForm.value });
+              } else {
+                this.modalService.dismissAll();
+                this.modalService.open(this.VINSearchProductNotFound);
+              }
+            } else {
+              this.toastr.warning(message);
+            }
+          } catch (error) {
+            this.toastr.warning(`Something went wrong.`);
+          }
+        }, error => console.log(error), () => { });
+      }
     }
   }
 
@@ -247,12 +301,47 @@ export class DashboardComponent implements OnInit {
   };
   
   getProductCountByResigNState() {
-	if (this.registrationOrVINSearchForm.value.rego_number !== '' && this.registrationOrVINSearchForm.value.state !== '') {
-      this.vinSearchProductCount({
-        'rego_number': this.registrationOrVINSearchForm.value.rego_number,
-        'state': this.registrationOrVINSearchForm.value.state
-      });
+    this.searchCriteria = "regoVIN";
+    // check local storage for items
+    console.log("vehicle registration, state");
+
+    const vinSearchProductCount = {
+      'rego_number': this.registrationOrVINSearchForm.value.rego_number,
+      'state': this.registrationOrVINSearchForm.value.state,
     }
+
+    this.regoVINKey = 'rego_vin_' + vinSearchProductCount.rego_number +'_'+ vinSearchProductCount.state;
+
+    const data = this.localStorageService.getItem(this.regoVINKey);
+    const result =  data ? JSON.parse(data) : null;
+    if(result !== null && result.data.data.data.length) {
+      this.vinProductCount = result.data.data.data.length;
+      if (result.data.data.data.length === 0 && ( this.registrationOrVINSearchForm.value.vin_number != null || this.registrationOrVINSearchForm.value.rego_number != null || this.registrationOrVINSearchForm.value.state != null ) ) {
+        this.modalService.dismissAll();
+        this.modalService.open(this.VINSearchProductNotFound);
+      }else{
+        if(result.data.data) {
+          if(result.data.data.data) {
+            if(result.data.data.data[0].dashboard_vehicles){
+              this.vehicles = result.data.data.data[0].dashboard_vehicles;
+              this.vehiclesLoaded = true;
+            } else{
+              this.vehicles = [];
+              this.vehiclesLoaded = false;
+            }
+          }                
+        }         
+      }      
+    }else {
+      if (this.registrationOrVINSearchForm.value.rego_number !== '' && this.registrationOrVINSearchForm.value.state !== '') {
+          this.vinSearchProductCount({
+            'rego_number': this.registrationOrVINSearchForm.value.rego_number,
+            'state': this.registrationOrVINSearchForm.value.state
+          });
+      }
+    }
+    // console.log('Loaded Data:', result);
+    // return false;
   };
 
   ngOnInit() {
@@ -264,6 +353,11 @@ export class DashboardComponent implements OnInit {
         if (res.success) {
           this.makeList = res.data;
           this.autofilData = res.data.all
+          // local storage
+          const vinSearchProductRespons = {
+            'data': res.data,
+            'data_all': res.data.all,
+          }
         }
       }, error => { }, () => { });
 
@@ -385,34 +479,145 @@ export class DashboardComponent implements OnInit {
     } catch (error) { }
 
     const queryParam = Util.objectToQueryString(FormControls);
-    const coutURL = `${this.productsAPI}${this.countAPI}?${queryParam}`;
-    this.countAPIRequest = this.$apiSer.get(coutURL).subscribe(res => {
-      if (res.success) {
-        this.productCount = res.data.count;
-        if (res.data.count === 0) {
-          this.modalService.dismissAll();
-          this.modalService.open(this.searchProductNotFound);
+    if(queryParam === '' || queryParam === null){
+      const data = this.localStorageService.getItem('productCount');
+      const result =  data ? data : null;
+      if (result === null ) {
+        const coutURL = `${this.productsAPI}${this.countAPI}?${queryParam}`;
+        this.countAPIRequest = this.$apiSer.get(coutURL).subscribe(res => {
+          if (res.success) {
+            this.productCount = res.data.count;
+            if(queryParam === ''){
+              this.vinProductCount = res.data.count;
+              this.localStorageService.setItem('productCount' , res.data.count);
+              this.localStorageService.setItem('vinProductCount' , res.data.count);
+            }          
+            if (res.data.count === 0) {
+              this.modalService.dismissAll();
+              this.modalService.open(this.searchProductNotFound);
 
-        }
+            }
+          }
+        }, error => console.log(error), () => { });
+
+      }else{
+          this.productCount = result;
       }
-    }, error => console.log(error), () => { });
+          
+    } else{
+      
+      const coutURL = `${this.productsAPI}${this.countAPI}?${queryParam}`;
+      this.countAPIRequest = this.$apiSer.get(coutURL).subscribe(res => {
+        if (res.success) {
+          this.productCount = res.data.count;         
+          if (res.data.count === 0) {
+            this.modalService.dismissAll();
+            this.modalService.open(this.searchProductNotFound);
+
+          }
+        }
+      }, error => console.log(error), () => { });
+    }
   }
 
   private vinSearchProductCount(FormControls = {}) {
-    const queryParam = Util.objectToQueryString(FormControls);
-    const coutURL = `${this.productsAPI}${this.countAPI}?${queryParam}`;
-    this.$apiSer.get(coutURL).subscribe(res => {
-      if (res.success) {
-        this.vinProductCount = res.data.count;
-        if (res.data.count === 0 && ( this.registrationOrVINSearchForm.value.vin_number != null || this.registrationOrVINSearchForm.value.vin_number.value.rego_number != null || this.registrationOrVINSearchForm.value.state != null ) ) {
-          this.modalService.dismissAll();
-          this.modalService.open(this.VINSearchProductNotFound);
-        }else{
-          this.vehicles = res.data.vehicles;
-          this.vehiclesLoaded = true;
+    // rego vinsearch step 2
+
+    const vinSearchProductCount = {
+      'rego_number': this.registrationOrVINSearchForm.value.rego_number,
+      'state': this.registrationOrVINSearchForm.value.state,
+    }
+
+    if(this.registrationOrVINSearchForm.value.rego_number !== '' && this.registrationOrVINSearchForm.value.state !== '' && this.registrationOrVINSearchForm.value.vin_number !== ''){
+      this.regoVINSearch = 'rego_state_vin';
+      this.regoVINKey = 'rego_vin_' + this.registrationOrVINSearchForm.value.rego_number +'_'+ this.registrationOrVINSearchForm.value.state +'_'+ this.registrationOrVINSearchForm.value.vin_number;
+    } else if(this.registrationOrVINSearchForm.value.rego_number !== '' && this.registrationOrVINSearchForm.value.state !== '' && this.registrationOrVINSearchForm.value.vin_number === ''){
+      this.regoVINSearch = 'rego_state';
+      this.regoVINKey = 'rego_vin_' + this.registrationOrVINSearchForm.value.rego_number +'_'+ this.registrationOrVINSearchForm.value.state;
+    } else if(this.registrationOrVINSearchForm.value.rego_number === '' && this.registrationOrVINSearchForm.value.state === '' && this.registrationOrVINSearchForm.value.vin_number !== ''){
+      this.regoVINSearch = 'vin';
+      this.regoVINKey = 'rego_vin_' + this.registrationOrVINSearchForm.value.vin_number;
+    } else{
+      this.regoVINKey = '';
+      this.regoVINSearch = '';
+    }
+
+    const data = this.localStorageService.getItem(this.regoVINKey);
+    const result =  data ? JSON.parse(data) : null;
+    if(result !== null && this.regoVINKey !== '') {
+      if (this.registrationOrVINSearchForm.valid) {   
+          this.vinProductCount = result.data.data.total;  
+          if (this.vinProductCount === 0 && ( this.registrationOrVINSearchForm.value.vin_number != null || this.registrationOrVINSearchForm.value.vin_number.value.rego_number != null || this.registrationOrVINSearchForm.value.state != null ) ) {
+            this.modalService.dismissAll();
+            this.modalService.open(this.VINSearchProductNotFound);
+          }else{
+            if(result.vinProductCount) {
+              if(result.data.data) {
+                if(result.data.data.data) {
+                  if(result.data.data.data[0].dashboard_vehicles){
+                    this.vehicles = result.data.data.data[0].dashboard_vehicles;
+                  }
+                }                
+              }  
+              this.vehiclesLoaded = true;
+            }else{
+              if(result.data.data) {
+                if(result.data.data.data) {
+                  if(result.data.data.data[0].dashboard_vehicles){
+                    this.vehicles = result.data.data.data[0].dashboard_vehicles;
+                  }
+                }                
+              } 
+              this.vehiclesLoaded = true;
+            }
+          }
         }
+    }
+    else{
+      if (this.registrationOrVINSearchForm.valid) {
+        const queryParam = Util.objectToQueryString(FormControls);
+        const coutURL = `${this.productsAPI}?${queryParam}`;
+        this.$apiSer.get(coutURL).subscribe(res => {
+          if (res.success) {
+            this.vinProductCount = res.data.total;
+            if (res.data.total === 0 && ( this.registrationOrVINSearchForm.value.vin_number != null || this.registrationOrVINSearchForm.value.vin_number.value.rego_number != null || this.registrationOrVINSearchForm.value.state != null ) ) {
+              this.modalService.dismissAll();
+              this.modalService.open(this.VINSearchProductNotFound);
+              this.searchResponse = {
+                'vinProductCount' : res.data.total,
+                'data' : res,
+              } 
+              if(queryParam === ''){
+                this.localStorageService.setItem('productCount' , res.data.total);
+                this.localStorageService.setItem('vinProductCount' , res.data.total);
+              }
+            }else{
+              if(res.data.data) {
+                if(res.data.data[0].dashboard_vehicles){
+                  this.vehicles = res.data.data[0].dashboard_vehicles;
+                }
+              }              
+              this.vehiclesLoaded = true;
+              this.searchResponse = {
+                'vinProductCount' : res.data.total,
+                'vehicles' : res.data.vehicles,
+                'vehiclesLoaded' : true,
+                'data' : res,
+                'fullData' : res.data,
+              } 
+              if(queryParam === ''){
+                this.localStorageService.setItem('productCount' , res.data.total);
+                this.localStorageService.setItem('vinProductCount' , res.data.total);
+              }
+            }
+            if(this.regoVINKey !== ''){
+              this.localStorageService.setItem(this.regoVINKey, JSON.stringify(this.searchResponse));
+            }
+          }
+        }, error => console.log(error), () => { });
       }
-    }, error => console.log(error), () => { });
+    }
+   
   }
 
 }

@@ -1,0 +1,11 @@
+# back up previous deploy
+
+sudo mkdir backups/$1
+sudo cp index.html backups/$1/
+sudo cp *.js backups/$1/
+sudo cp *.css backups/$1/
+
+# remove files frm fd-front-end/dist
+sudo rm fd-front-end/dist/*.js
+sudo rm fd-front-end/dist/index.html
+sudo rm fd-front-end/dist/*.css

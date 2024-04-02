@@ -134,7 +134,8 @@
                             Brake System
                         </div>
                         <div class="col-sm-6 col-6">
-                            {{productDetail.brake_system}}
+                            <!-- {{productDetail.brake_system}} -->
+                            {{ productDetail.brake_system ? productDetail.brake_system : productDetail.description }}
                         </div>
                         <div class="col-sm-6 col-6">
                             Length

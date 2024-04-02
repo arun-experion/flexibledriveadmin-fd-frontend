@@ -60,7 +60,7 @@ export class AssociatedPartsComponent implements OnInit {
     }).subscribe(res => {
       if (res.success) {
         part.addToCart = 1;
-        this.toastrSer.success(`${part.product_nr} is added in the cart.`);
+        this.toastrSer.success(`${part.company_sku} is added in the cart.`);
       } else {
         this.toastrSer.warning(`${res.message}`);
       }

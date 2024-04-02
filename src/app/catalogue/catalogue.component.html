@@ -20,7 +20,7 @@
               <a class="btn btn-primary d-block" [routerLink]="['/dashboard']">New Search</a>
             </div>
             <div class="widget border-0">
-              <a style="cursor: pointer;" class="btn btn-primary bg-light d-block" (click)="getAllProducts()">Clear
+              <a style="cursor: pointer;" class="btn btn-primary bg-light d-block" (click)="clearFilter();">Clear
                 Filter</a>
             </div>
             <div class="widget">
@@ -329,7 +329,7 @@
                 </div>
               </div>
             </li>
-            <li *ngIf="productData.length === 0 && !isProductLoading">
+            <li *ngIf="productData !== undefined && productData.length === 0 && !isProductLoading">
               <div class="row sm-gutters">
                 <p style="margin: 0 auto;">No Part found.</p>
               </div>

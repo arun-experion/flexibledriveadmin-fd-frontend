@@ -71,7 +71,8 @@
                         Brake System
                     </div>
                     <div class="col-sm-6">
-                        {{productDetail.brake_system}}
+                        <!-- {{productDetail.brake_system}} -->
+                        {{ productDetail.brake_system ? productDetail.brake_system : productDetail.description }}
                     </div>
                     <div class="col-sm-6">
                         Length
@@ -241,13 +242,18 @@
                     <tr>
                         <th nowrap>Brake System</th>
                         <td *ngIf="compareProductList && compareProductList.length && compareProductList[0]">
-                            {{compareProductList[0]?.brake_system}}
+                            <!-- {{compareProductList[0]?.brake_system}} -->
+                            {{ compareProductList[0]?.brake_system ? compareProductList[0]?.brake_system : compareProductList[0]?.description }}
                         </td>
                         <td *ngIf="compareProductList && compareProductList.length && compareProductList[1]">
-                            {{compareProductList[1]?.brake_system}}
+                            <!-- {{compareProductList[1]?.brake_system}} -->
+                            {{ compareProductList[1]?.brake_system ? compareProductList[1]?.brake_system : compareProductList[1]?.description }}
+
                         </td>
                         <td *ngIf="compareProductList && compareProductList.length && compareProductList[2]">
-                            {{compareProductList[2]?.brake_system}}
+                            <!-- {{compareProductList[2]?.brake_system}} -->
+                            {{ compareProductList[2]?.brake_system ? compareProductList[2]?.brake_system : compareProductList[2]?.description }}
+
                         </td>
                     </tr>
                     <tr>

@@ -180,7 +180,7 @@ export class CartoverlayComponent implements OnInit {
       if (res.success) {
         objProduct.quantity = 1;
         objProduct.addToCart = 0;
-        this.toastr.warning(`you have removed ${objProduct.product_nr} from the cart`);
+        this.toastr.warning(`you have removed ${objProduct.company_sku} from the cart`);
       } else {
         this.toastr.warning(`${res.message}`);
       }

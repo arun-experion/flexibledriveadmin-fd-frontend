@@ -81,13 +81,23 @@ export class TopNavComponent implements OnInit, AfterContentChecked, OnDestroy {
   }
 
   getCartProducts() {
+    this.productData = [];
     this.productData = this.Productlist.getCart();
     this.cartProductCount = 0;
-    this.productData.forEach(objProductRow => {
-      if (objProductRow.addToCart > 0) {
-        this.cartProductCount = this.cartProductCount + 1;
-      }
-    });
+    if(this.productData && Array.isArray(this.productData)){
+      this.productData.forEach(objProductRow => {
+        if (objProductRow.addToCart > 0) {
+          this.cartProductCount = this.cartProductCount + 1;
+        }
+      });
+    } else if(!Array.isArray(this.productData)){
+      const productDataArray: Array<[string, any]> = Object.entries(this.productData);
+      productDataArray.forEach(objProductRow => {
+        if (objProductRow['addToCart'] > 0) {
+          this.cartProductCount = this.cartProductCount + 1;
+        }
+      });
+    }
   }
 
   priceToggle(ev) {

@@ -1,0 +1,3 @@
+sudo rm *.js
+sudo rm index.html
+sudo rm *.css
