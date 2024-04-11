@@ -527,12 +527,15 @@ export class CartComponent implements OnInit, AfterContentChecked {
         this.isPickUpMethodSelected)) {
       this.pickUpProductIDs = this.orderListForPickUp.map(el => el.product.id);
     }
-
+  if(this.isDeliveryMethodSelected &&this.isPickUpMethodSelected){  
+      this.deliveryProductIDs = this.orderListForDelivery.map(el => el.product.id);
+      this.pickUpProductIDs = this.orderListForPickUp.map(el => el.product.id);
+    }
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
-
+    
     if (this.cartForm.invalid ||
-      (this.orderList.length !==
+      !(this.orderList.length <=
         (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
       this.validateAllFormFields(this.cartForm);
       return;
@@ -546,6 +549,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
 
     this.loading = true;
     this.isCartSubmitDisabled = true;
+  
 
     this.$apiSer.post(
       `${this.cartAPI}/placeorder`,
@@ -594,6 +598,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   }
 
   confirmOrder() {
+  
     this.$apiSer.get(`${this.cartAPI}/placeorder`).subscribe(res => {
       if (res.success) {
         this.orderPlaced = true;

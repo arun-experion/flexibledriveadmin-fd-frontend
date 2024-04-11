@@ -227,7 +227,7 @@
                             <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
                               [checked]="order.product.selected"
                               (change)="order.product.selected = !order.product.selected; onCheckDelivery(order.product);"
-                              [disabled]="order.product.disabled">
+                              >
                             <label class="custom-control-label" for="delivery_{{order.product.product_nr}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -365,7 +365,7 @@
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" name="pickUp_{{order.product.id}}" id="pickUp_{{order.product.id}}"
                               class="custom-control-input" [checked]="order.product.selected" (change)="onCheckPickUp(order.product)"
-                              [disabled]="order.product.disabled">
+                              >
                             <label class="custom-control-label" for="pickUp_{{order.product.id}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -443,6 +443,7 @@
                             </div>
                           </li>
                         </ul>
+                        <span *ngIf="!pickUpForm.controls.location.valid && pickUpForm.controls.location.touched" class="text-danger">Please select a pick-up location.</span>
                       </div>
                       <div class="form-group col-md-12 col-12">
                         <label for="pickup.date">Pick-up & Time</label>
@@ -481,7 +482,7 @@
                 </div>
                 <div class="col-md-12 col-12 confirm-btn my-5">
                   <div class="form-group"
-                    *ngIf="!(orderList.length === (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
+                    *ngIf="!(orderList.length <= (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
                     <ul class="invalid-feedback" style="display: block;">
                       <li>
                         Need to select all products according to delivery method you want to select.
@@ -494,7 +495,6 @@
                       <li>{{messages[key]}}</li>
                     </ul>
                   </div>
-
                   <button type="submit" class="btn btn-primary btn-long" data-toggle="modal"
                     data-target="#confirmationpopup" tabindex="16" [disabled]="isCartSubmitDisabled">Confirm</button>
                   <img class="mr-3" *ngIf="loading"
