@@ -544,24 +544,10 @@ export class CartComponent implements OnInit, AfterContentChecked {
 
     if(this.isDeliveryMethodSelected &&this.isPickUpMethodSelected){
     
-      if(this.isDeliveryMethodSelected){
         this.deliveryProductIDs = this.orderListForDelivery
-        .filter(el => el.product.selected)
         .map(el => el.product.id);  
-      }
-      else if(this.isPickUpMethodSelected){
         this.pickUpProductIDs = this.orderListForPickUp
-        .filter(el => el.product.selected)
         .map(el => el.product.id); 
-      }
-      else{
-        this.deliveryProductIDs = this.orderListForDelivery
-        .filter(el => el.product.selected)
-        .map(el => el.product.id);    
-        this.pickUpProductIDs = this.orderListForPickUp
-        .filter(el => el.product.selected)
-        .map(el => el.product.id); 
-      }
     }
     
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
