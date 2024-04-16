@@ -52,7 +52,7 @@ import { NgbDatepickerConfig, NgbCalendar, NgbDate, NgbDateParserFormatter, NgbM
 export class CartComponent implements OnInit, AfterContentChecked {
   objectKeys = Object.keys;
   orderList = [];
-  cartSubTotal: string;
+  cartSubTotal: number;
   cartGST: string;
   cartDeliveryCharges: string;
   cartTotal: string;
@@ -88,6 +88,8 @@ export class CartComponent implements OnInit, AfterContentChecked {
   @Input() showCartPickupDeliveryForm: boolean;
 
   @ViewChild('cartBackOrderModal', { static: false }) cartBackOrderModal;
+  @ViewChild('cartconfirmpopup', { static: false }) cartconfirmpopup;
+
   carBackOrderPart: any;
 
   isDeliveryMethodSelected = true;
@@ -233,6 +235,9 @@ export class CartComponent implements OnInit, AfterContentChecked {
         ]
       }]
     });
+  }
+  getAdjustedSubtotal(): number {
+    return this.cartSubTotal - 100;
   }
 
   ngOnInit() {
@@ -517,53 +522,60 @@ export class CartComponent implements OnInit, AfterContentChecked {
     this.isCartFormSubmited = true;
 
     if (this.isDeliveryMethodSelected &&
-      !(this.isDeliveryMethodSelected &&
-        this.isPickUpMethodSelected)) {
-      this.deliveryProductIDs = this.orderListForDelivery.map(el => el.product.id);
+        !(this.isDeliveryMethodSelected &&
+            this.isPickUpMethodSelected)) {
+        this.deliveryProductIDs = this.orderListForDelivery.map(el => el.product.id);
     }
 
     if (this.isPickUpMethodSelected &&
-      !(this.isDeliveryMethodSelected &&
-        this.isPickUpMethodSelected)) {
-      this.pickUpProductIDs = this.orderListForPickUp.map(el => el.product.id);
+        !(this.isDeliveryMethodSelected &&
+            this.isPickUpMethodSelected)) {
+        this.pickUpProductIDs = this.orderListForPickUp.map(el => el.product.id);
     }
 
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
 
     if (this.cartForm.invalid ||
-      (this.orderList.length !==
-        (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
-      this.validateAllFormFields(this.cartForm);
-      return;
+        (this.orderList.length !==
+            (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
+        this.validateAllFormFields(this.cartForm);
+        return;
     }
 
     try {
-      // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
-      const { year, month, day } = this.pickUpForm.controls.date.value;
-      this.cartForm.value.pickup.date = `${year}-${month}-${day}`;
+        // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
+        const { year, month, day } = this.pickUpForm.controls.date.value;
+        this.cartForm.value.pickup.date = `${year}-${month}-${day}`;
     } catch (error) { }
+    this.modal.open(this.cartconfirmpopup, {
+      backdrop: 'static',
+      keyboard: false
+    });
+  }
 
+  onPlaceOrder() {
     this.loading = true;
     this.isCartSubmitDisabled = true;
-
-    this.$apiSer.post(
-      `${this.cartAPI}/placeorder`,
-      this.cartForm.value
-    ).subscribe(res => {
-      if (res.success) {
-        this.toastr.success(`${res.message} Please add order reference number.`);
-        this.isOrderPlaced = true;
-        this.order = res.data;
-        sessionStorage.removeItem('reOrder');
-      } else {
-        this.isOrderPlaceFailed = true;
-        this.messages = res.data;
-      }
-    }, error => console.log(error), () => {
-      this.loading = false;
-      this.isCartSubmitDisabled = true;
-    });
+  
+    this.$apiSer.post(`${this.cartAPI}/placeorder`, this.cartForm.value)
+        .subscribe(res => {
+            if (res.success) {
+                this.toastr.success(`${res.message} Please add order reference number.`);
+                this.isOrderPlaced = true;
+                this.order = res.data;
+                sessionStorage.removeItem('reOrder');
+            } else {
+                this.isOrderPlaceFailed = true;
+                this.messages = res.data;
+            }
+        }, error => {
+            console.log(error);
+        }, () => {
+            this.loading = false;
+            this.isCartSubmitDisabled = true;
+            
+        });
   }
 
   onCheckDelivery = (product) => {
