@@ -13,7 +13,7 @@ import {
 import {
   CARTAPI,
   TOASTRTIMEOUT,
-  DISCOUNTAPI
+  OFFERAPI
 } from '../constant';
 
 import {
@@ -57,9 +57,10 @@ export class CartComponent implements OnInit, AfterContentChecked {
   marginAmount: number;
   discountPercentage: number;
   cartSubTotal: number;
+  cartDiscount: number;
   cartGST: string;
   cartDeliveryCharges: string;
-  cartTotal: string;
+  cartTotal: number;a
   pickUpLocations = [];
   pickUpLocationAddress = '';
   pickUpLocationContact = '';
@@ -87,6 +88,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   postNineThrityDelivery = false;
   pickupTimeError = "";
 
+
   @Input() showCartDeliveryForm: boolean;
   @Input() showCartPickupForm: boolean;
   @Input() showCartPickupDeliveryForm: boolean;
@@ -102,7 +104,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   productFromUserState = 0;
   productAvailableLocations = [];
   productInterStateAvailable = 0;
-  private DiscountAPI=DISCOUNTAPI;
+  private Offer=OFFERAPI;
   private cartAPI = CARTAPI;
   private state = {
     "QLD": "Queensland Branch",
@@ -248,6 +250,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   }
 
   ngOnInit() {
+    this.offers();
     this.showPrice.setPriceChangeDisabled(false);
     this.showPrice.isPriceVisible.subscribe(res => {
       this.isPriceVisible = res;
@@ -318,12 +321,14 @@ export class CartComponent implements OnInit, AfterContentChecked {
           }
         })
       })
-
+     
       this.cartSubTotal = cart.data.subtotal;
+      this.offers();
       this.cartGST = cart.data.GST;
       this.cartDeliveryCharges = cart.data.delivery;
-      this.cartTotal = cart.data.total;
       this.pickUpLocations = cart.data.location;
+      this.cartDiscount=(this.cartSubTotal*this.discountPercentage)/100;
+      this.cartTotal = cart.data.total-this.cartDiscount;
     });
 
     /**
@@ -549,28 +554,58 @@ export class CartComponent implements OnInit, AfterContentChecked {
         this.validateAllFormFields(this.cartForm);
         return;
     }
-    this.$apiSer.get(`${this.DiscountAPI}/${this.cartSubTotal}`).subscribe(
-      res => {
-        if (res.success) { 
-          this.marginAmount = res.data.margin_amount;
-          this.discountPercentage = res.data.discount_percentage;
-        }
-      },
-      error => {
-        console.error('Error:', error);
-      }
-    );
+   
     
     try {
         // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
         const { year, month, day } = this.pickUpForm.controls.date.value;
         this.cartForm.value.pickup.date = `${year}-${month}-${day}`;
     } catch (error) { }
-    this.modal.open(this.cartconfirmpopup, {
-      backdrop: 'static',
-      keyboard: false
-    });
+    if(this.getAdjustedSubtotal()>0){
+      this.modal.open(this.cartconfirmpopup, {
+        backdrop: 'static',
+        keyboard: false
+      });
+    }
+    else{
+      this.onPlaceOrder();
+    }
+    
   }
+
+  offers() {
+    const offerKey = 'cached_offers';
+    const cachedOffers = localStorage.getItem(offerKey);
+    if (cachedOffers) {
+        const dicountoffer = JSON.parse(cachedOffers).filter(offer => offer.margin_amount > this.cartSubTotal);
+        if (dicountoffer.length > 0) {
+            this.marginAmount = dicountoffer[0].margin_amount;
+            this.discountPercentage = dicountoffer[0].discount_percentage;
+        } else {
+            this.marginAmount = 0; 
+            this.discountPercentage = 0;
+        }
+    } else {
+        this.$apiSer.get(`${this.Offer}`).subscribe(
+            res => {
+                if (res.success) {
+                    const dicountoffer = res.data.filter(offer => offer.margin_amount > this.cartSubTotal);
+                    if (dicountoffer.length > 0) {
+                        this.marginAmount = dicountoffer[0].margin_amount;
+                        this.discountPercentage = dicountoffer[0].discount_percentage;
+                    } else {
+                        this.marginAmount = 0; 
+                        this.discountPercentage = 0;
+                    }
+                    localStorage.setItem(offerKey, JSON.stringify(res.data));
+                }
+            },
+            error => {
+                console.error('Error:', error);
+            }
+        );
+    }
+}
 
   onPlaceOrder() {
     this.loading = true;
@@ -693,7 +728,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
         });
       }
     }
-
   }
 
   decreseQuantityInCart(product) {
