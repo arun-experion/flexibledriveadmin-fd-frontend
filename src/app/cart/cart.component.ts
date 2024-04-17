@@ -12,7 +12,8 @@ import {
 
 import {
   CARTAPI,
-  TOASTRTIMEOUT
+  TOASTRTIMEOUT,
+  DISCOUNTAPI
 } from '../constant';
 
 import {
@@ -41,6 +42,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { ShowPriceService } from '../services/show-price.service';
 
 import { NgbDatepickerConfig, NgbCalendar, NgbDate, NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LocalStorageService } from '../local-storage.service';
 
 @Component({
   selector: 'app-cart',
@@ -52,6 +54,8 @@ import { NgbDatepickerConfig, NgbCalendar, NgbDate, NgbDateParserFormatter, NgbM
 export class CartComponent implements OnInit, AfterContentChecked {
   objectKeys = Object.keys;
   orderList = [];
+  marginAmount: number;
+  discountPercentage: number;
   cartSubTotal: number;
   cartGST: string;
   cartDeliveryCharges: string;
@@ -98,7 +102,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   productFromUserState = 0;
   productAvailableLocations = [];
   productInterStateAvailable = 0;
-
+  private DiscountAPI=DISCOUNTAPI;
   private cartAPI = CARTAPI;
   private state = {
     "QLD": "Queensland Branch",
@@ -119,7 +123,9 @@ export class CartComponent implements OnInit, AfterContentChecked {
     private showPrice: ShowPriceService,
     config: NgbDatepickerConfig,
     calendar: NgbCalendar,
-    private modal: NgbModal
+    private modal: NgbModal,
+    private localStorageService: LocalStorageService,
+
   ) {
     this.authServ.currentUser.subscribe(user => {
       this.currentUser = user;
@@ -236,8 +242,9 @@ export class CartComponent implements OnInit, AfterContentChecked {
       }]
     });
   }
+  
   getAdjustedSubtotal(): number {
-    return this.cartSubTotal - 100;
+    return this.marginAmount-this.cartSubTotal;
   }
 
   ngOnInit() {
@@ -542,7 +549,18 @@ export class CartComponent implements OnInit, AfterContentChecked {
         this.validateAllFormFields(this.cartForm);
         return;
     }
-
+    this.$apiSer.get(`${this.DiscountAPI}/${this.cartSubTotal}`).subscribe(
+      res => {
+        if (res.success) { 
+          this.marginAmount = res.data.margin_amount;
+          this.discountPercentage = res.data.discount_percentage;
+        }
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+    
     try {
         // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
         const { year, month, day } = this.pickUpForm.controls.date.value;
