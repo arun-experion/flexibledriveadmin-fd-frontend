@@ -56,6 +56,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   orderList = [];
   marginAmount: number;
   discountPercentage: number;
+  lastDiscountPercentage:number;
   cartSubTotal: number;
   cartDiscount: number;
   cartGST: string;
@@ -327,7 +328,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
       this.cartGST = cart.data.GST;
       this.cartDeliveryCharges = cart.data.delivery;
       this.pickUpLocations = cart.data.location;
-      this.cartDiscount=(this.cartSubTotal*this.discountPercentage)/100;
+      this.cartDiscount=(this.cartSubTotal*this.lastDiscountPercentage)/100;
       this.cartTotal = cart.data.total-this.cartDiscount;
     });
 
@@ -577,25 +578,54 @@ export class CartComponent implements OnInit, AfterContentChecked {
     const offerKey = 'cached_offers';
     const cachedOffers = localStorage.getItem(offerKey);
     if (cachedOffers) {
-        const dicountoffer = JSON.parse(cachedOffers).filter(offer => offer.margin_amount > this.cartSubTotal);
-        if (dicountoffer.length > 0) {
-            this.marginAmount = dicountoffer[0].margin_amount;
-            this.discountPercentage = dicountoffer[0].discount_percentage;
+      
+        const discountoffer = JSON.parse(cachedOffers).filter(offer => offer.margin_amount > this.cartSubTotal);
+        const lastdiscountoffer = JSON.parse(cachedOffers).filter(offer => offer.margin_amount < this.cartSubTotal);
+        if (discountoffer.length > 0) {
+
+            this.marginAmount = discountoffer[0].margin_amount;
+            this.discountPercentage = discountoffer[0].discount_percentage;
+
+            if(lastdiscountoffer.length>0){
+              this.lastDiscountPercentage = lastdiscountoffer[lastdiscountoffer.length - 1].discount_percentage;
+            }
+            else{
+              this.lastDiscountPercentage = 0;
+            }
+           
         } else {
-            this.marginAmount = 0; 
-            this.discountPercentage = 0;
+          const cachedOfferArray = JSON.parse(cachedOffers);
+          if (cachedOfferArray.length > 0) {
+              this.lastDiscountPercentage = cachedOfferArray[cachedOfferArray.length - 1].discount_percentage;
+          }
+          else{
+            this.lastDiscountPercentage = 0;
+          }
         }
     } else {
         this.$apiSer.get(`${this.Offer}`).subscribe(
             res => {
                 if (res.success) {
-                    const dicountoffer = res.data.filter(offer => offer.margin_amount > this.cartSubTotal);
-                    if (dicountoffer.length > 0) {
-                        this.marginAmount = dicountoffer[0].margin_amount;
-                        this.discountPercentage = dicountoffer[0].discount_percentage;
-                    } else {
-                        this.marginAmount = 0; 
-                        this.discountPercentage = 0;
+                    const discountoffer = res.data.filter(offer => offer.margin_amount > this.cartSubTotal);
+                    const lastdiscountoffer = res.data.filter(offer => offer.margin_amount < this.cartSubTotal);
+                    if (discountoffer.length > 0) {
+                        this.marginAmount = discountoffer[0].margin_amount;
+                        this.discountPercentage = discountoffer[0].discount_percentage;
+                        if(lastdiscountoffer.length>0){
+                          this.lastDiscountPercentage = lastdiscountoffer[lastdiscountoffer.length - 1].discount_percentage;
+                        }
+                        else{
+                          this.lastDiscountPercentage = 0;
+                        }
+                    }
+                   else {
+                    const offersArray = res.data;
+                    if (offersArray.length > 0) {
+                        this.lastDiscountPercentage = offersArray[offersArray.length - 1].discount_percentage;
+                    }
+                    else{
+                      this.lastDiscountPercentage = 0;
+                    }
                     }
                     localStorage.setItem(offerKey, JSON.stringify(res.data));
                 }
