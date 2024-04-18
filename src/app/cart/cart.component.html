@@ -225,13 +225,12 @@
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForDelivery">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
-                            #deliveryCheck
-                           
+                            #deliveryCheck                         
                               [checked]="order.product.selected"
                               (change)="onCheckDelivery(order.product);"
                               [disabled]="order.product.disabled"
+                             >
                               
-                              >
                             <label class="custom-control-label" for="delivery_{{order.product.product_nr}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -376,6 +375,7 @@
                               [disabled]="order.product.disabled"
                               
                               >
+                              
                             <label class="custom-control-label" for="pickUp_{{order.product.id}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">

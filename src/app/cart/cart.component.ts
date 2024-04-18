@@ -84,7 +84,8 @@ export class CartComponent implements OnInit, AfterContentChecked {
   isSameDayOrder = false;
   postNineThrityDelivery = false;
   pickupTimeError = "";
- 
+  selectedDeliveryIndices: number[] = [];
+  selectedPickupIndices: number[] = [];
 
   @Input() showCartDeliveryForm: boolean;
   @Input() showCartPickupForm: boolean;
@@ -124,6 +125,8 @@ export class CartComponent implements OnInit, AfterContentChecked {
     calendar: NgbCalendar,
     private modal: NgbModal
   ) {
+
+
     this.authServ.currentUser.subscribe(user => {
       this.currentUser = user;
     });
@@ -357,7 +360,10 @@ export class CartComponent implements OnInit, AfterContentChecked {
     } catch (error) { }
   }
 
-
+// Function to calculate the maximum number of products allowed
+calculateMaxProductsAllowed(): number {
+  return this.orderListForDelivery.length || this.orderListForPickUp.length;
+}
   ngAfterContentChecked() {
    
     this.orderListForDelivery = JSON.parse(JSON.stringify(this.orderList));
@@ -372,9 +378,50 @@ export class CartComponent implements OnInit, AfterContentChecked {
       (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
     });
+    const maxProductsAllowed = this.calculateMaxProductsAllowed();
   
+    const selectedIndicesDelivery: number[] = [];
+    const selectedIndicesPickup: number[] = [];
 
+    this.orderListForDelivery.forEach((order, index) => {
+      if (this.deliveryProductIDs.indexOf(order.product.id) !== -1) {
+        selectedIndicesDelivery.push(index); // Store the index of selected checkboxes for delivery
+      }
+    });
+  
+    this.orderListForPickUp.forEach((order, index) => {
+      if (this.pickUpProductIDs.indexOf(order.product.id) !== -1) {
+        selectedIndicesPickup.push(index); // Store the index of selected checkboxes for pickup
+      }
+    });
+
+    if (selectedIndicesDelivery.length > 0) {
+      this.orderListForDelivery.forEach((order, index) => {
+        // Check if the checkbox is not selected for delivery and it's not already disabled
+        if (this.deliveryProductIDs.indexOf(order.product.id) === -1 && !order.product.disabled) {
+
+          // Check if there is only one unselected checkbox left for delivery
+          if (selectedIndicesDelivery.length === maxProductsAllowed - 1) {
+            order.product.disabled = true;
+          }         
+        }      
+      });
+    }
+  
+    if (selectedIndicesPickup.length > 0) {
+      this.orderListForPickUp.forEach((order, index) => {
+        // Check if the checkbox is not selected for pickup and it's not already disabled
+        if (this.pickUpProductIDs.indexOf(order.product.id) === -1 && !order.product.disabled) {
+          // Check if there is only one unselected checkbox left for pickup
+          if (selectedIndicesPickup.length === maxProductsAllowed - 1) {
+            order.product.disabled = true;
+          }
+        }
+      });
+    }
+   
   }
+ 
 
   updateDeliveryDate(){
     let withinHomeState = false;
@@ -541,17 +588,20 @@ export class CartComponent implements OnInit, AfterContentChecked {
       .map(el => el.product.id);
       
     }
-
-    if(this.isDeliveryMethodSelected &&this.isPickUpMethodSelected){
-    
-        this.deliveryProductIDs = this.orderListForDelivery
-        .map(el => el.product.id);  
-        this.pickUpProductIDs = this.orderListForPickUp
-        .map(el => el.product.id); 
-    }
     
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
+
+    // Check if no checkboxes are selected for delivery or pickup
+  if (this.isDeliveryMethodSelected && this.deliveryProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for delivery.');
+    return;
+  }
+
+  if (this.isPickUpMethodSelected && this.pickUpProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for pick up.');
+    return;
+  }
     
     if (this.cartForm.invalid ||
       !(this.orderList.length <=
@@ -559,6 +609,17 @@ export class CartComponent implements OnInit, AfterContentChecked {
       this.validateAllFormFields(this.cartForm);
       return;
     }
+
+     // Check if no checkboxes are selected for delivery or pickup
+  if (this.isDeliveryMethodSelected && this.deliveryProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for delivery.');
+    return;
+  }
+
+  if (this.isPickUpMethodSelected && this.pickUpProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for pick up.');
+    return;
+  }
 
     try {
       // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
@@ -599,8 +660,8 @@ export class CartComponent implements OnInit, AfterContentChecked {
   
   }
 
-  onCheckPickUp = (product) => {
-
+  onCheckPickUp = (product,index:number) => {
+    
     if (this.pickUpProductIDs.indexOf(product.id) === -1) {
       this.pickUpProductIDs.push(product.id);
     } else {
