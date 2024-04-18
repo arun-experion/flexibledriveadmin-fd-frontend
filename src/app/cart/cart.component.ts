@@ -88,7 +88,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
   isSameDayOrder = false;
   postNineThrityDelivery = false;
   pickupTimeError = "";
-  private cartSubscription: Subscription;
 
 
   @Input() showCartDeliveryForm: boolean;
@@ -128,8 +127,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
     config: NgbDatepickerConfig,
     calendar: NgbCalendar,
     private modal: NgbModal,
-    private localStorageService: LocalStorageService,
-
   ) {
     this.authServ.currentUser.subscribe(user => {
       this.currentUser = user;
@@ -303,7 +300,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
       day: currentDate.getDate()
     };
 
-    this.cartSubscription =this.prodSer.cart.subscribe(cart => {
+    this.prodSer.cart.subscribe(cart => {
       let availableBranchIds = []
       this.productAvailableLocations = [];
 
@@ -791,11 +788,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
       }, error => console.log(error), () => {
         this.prodSer.getCartItems();
       });
-    }
-  }
-  ngOnDestroy() {
-    if (this.cartSubscription) {
-      this.cartSubscription.unsubscribe();
     }
   }
 }
