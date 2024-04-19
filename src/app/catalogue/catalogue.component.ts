@@ -13,7 +13,7 @@ import {
   SESSIONSTORAGECOMPARELIST,
   SESSIONSTORAGECOMPARELISTIDS,
   COMPAREOVERLAYTIMEOUT,
-  POSITIONSAPI
+  POSITIONSAPI,
 } from '../constant';
 import { Util } from '../utils/util';
 import { ToastrService } from 'ngx-toastr';
@@ -29,6 +29,9 @@ import { Product } from '../product.model';
   styleUrls: ['./catalogue.component.css']
 })
 export class CatalogueComponent implements OnInit {
+  marginAmount: number;
+  discountPercentage: number;
+  cartSubTotal: number;
   brandData: any = [];
   productData: any = [];
   categoryData: any = [];

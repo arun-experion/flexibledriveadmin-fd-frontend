@@ -188,7 +188,6 @@ export class CartoverlayComponent implements OnInit {
       this.Productlist.getCartItems();
     });
   }
-
   close() {
     this.visible = false;
     this.visibleChange.emit(this.visible);
