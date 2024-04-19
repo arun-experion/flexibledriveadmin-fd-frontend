@@ -61,7 +61,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   cartDiscount: number;
   cartGST: string;
   cartDeliveryCharges: string;
-  cartTotal: number;a
+  cartTotal: number;
   pickUpLocations = [];
   pickUpLocationAddress = '';
   pickUpLocationContact = '';
