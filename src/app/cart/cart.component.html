@@ -221,16 +221,13 @@
                       *ngIf="isPickUpMethodSelected === true">
                       <p class="small font-weight-bold text-dark">Select items to be delivered</p>
                       <ul class="list-unstyled payment-options">
-
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForDelivery">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
                             #deliveryCheck                         
-                              [checked]="order.product.selected"
+                              [checked]="order.product.selected"                            
                               (change)="onCheckDelivery(order.product);"
-                              [disabled]="order.product.disabled"
-                             >
-                              
+                              [disabled]="order.product.disabled">                              
                             <label class="custom-control-label" for="delivery_{{order.product.product_nr}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -368,12 +365,10 @@
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" name="pickUp_{{order.product.id}}" id="pickUp_{{order.product.id}}"
                             #pickUpCheck
-                              class="custom-control-input" 
-                             
+                              class="custom-control-input"                             
                               [checked]="order.product.selected"
                               (change)="onCheckPickUp(order.product)"
-                              [disabled]="order.product.disabled"
-                              
+                              [disabled]="order.product.disabled"                             
                               >
                               
                             <label class="custom-control-label" for="pickUp_{{order.product.id}}">
@@ -492,7 +487,7 @@
                 </div>
                 <div class="col-md-12 col-12 confirm-btn my-5">
                   <div class="form-group"
-                    *ngIf="!(orderList.length <= (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
+                    *ngIf="!(orderList.length == (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
                     <ul class="invalid-feedback" style="display: block;">
                       <li>
                         Need to select all products according to delivery method you want to select.

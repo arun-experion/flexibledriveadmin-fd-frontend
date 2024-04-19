@@ -5,7 +5,8 @@ import {
   AfterContentChecked,
   ViewChild,
   QueryList,
-  ViewChildren
+  ViewChildren,
+  AfterViewInit
 } from '@angular/core';
 
 import {
@@ -51,6 +52,8 @@ import { NgbDatepickerConfig, NgbCalendar, NgbDate, NgbDateParserFormatter, NgbM
   providers: [NgbDatepickerConfig]
 })
 
+
+
 export class CartComponent implements OnInit, AfterContentChecked {
   objectKeys = Object.keys;
   orderList = [];
@@ -86,6 +89,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   pickupTimeError = "";
   selectedDeliveryIndices: number[] = [];
   selectedPickupIndices: number[] = [];
+  selectedIndices: number[] = [];
 
   @Input() showCartDeliveryForm: boolean;
   @Input() showCartPickupForm: boolean;
@@ -125,7 +129,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
     calendar: NgbCalendar,
     private modal: NgbModal
   ) {
-
+    
 
     this.authServ.currentUser.subscribe(user => {
       this.currentUser = user;
@@ -588,7 +592,8 @@ calculateMaxProductsAllowed(): number {
       .map(el => el.product.id);
       
     }
-    
+
+      
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
 
@@ -650,22 +655,24 @@ calculateMaxProductsAllowed(): number {
     });
   }
 
+
   onCheckDelivery = (product) => {
+   
 
     if (this.deliveryProductIDs.indexOf(product.id) === -1) {
       this.deliveryProductIDs.push(product.id);
     } else {
-      this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id));
+      this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id),1);
     }
   
   }
 
-  onCheckPickUp = (product,index:number) => {
+  onCheckPickUp = (product) => {
     
     if (this.pickUpProductIDs.indexOf(product.id) === -1) {
       this.pickUpProductIDs.push(product.id);
     } else {
-      this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id));
+      this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id),1);
     }
   
   }
