@@ -735,8 +735,7 @@ calculateMaxProductsAllowed(): number {
     });
   }
 
-  confirmOrder() {
-  
+  confirmOrder() { 
     this.$apiSer.get(`${this.cartAPI}/placeorder`).subscribe(res => {
       if (res.success) {
         this.orderPlaced = true;
