@@ -228,7 +228,6 @@
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForDelivery">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
-                            #deliveryCheck                         
                               [checked]="order.product.selected"                            
                               (change)="onCheckDelivery(order.product);"
                               [disabled]="order.product.disabled">                              
@@ -368,7 +367,6 @@
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForPickUp; let i = index;">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" name="pickUp_{{order.product.id}}" id="pickUp_{{order.product.id}}"
-                            #pickUpCheck
                               class="custom-control-input"                             
                               [checked]="order.product.selected"
                               (change)="onCheckPickUp(order.product)"

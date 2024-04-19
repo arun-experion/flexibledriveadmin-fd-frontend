@@ -248,7 +248,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
   getAdjustedSubtotal(): number {
     return this.marginAmount-this.cartSubTotal;
   }
-
   ngOnInit() {
     this.offers();
     this.showPrice.setPriceChangeDisabled(false);
