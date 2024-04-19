@@ -373,8 +373,7 @@
                               [checked]="order.product.selected"
                               (change)="onCheckPickUp(order.product)"
                               [disabled]="order.product.disabled"                             
-                              >
-                              
+                              >                            
                             <label class="custom-control-label" for="pickUp_{{order.product.id}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -400,7 +399,7 @@
                         <label for="pickup.first_name">First Name</label>
                         <div class="input-animate">
                           <input type="text" class="form-control" tabindex="11" formControlName="first_name"
-                            id="pickup.first_name" >
+                            id="pickup.first_name" />
                           <span class="focus-border"><i></i></span>
                         </div>
                         <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.first_name.errors"

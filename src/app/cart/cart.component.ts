@@ -54,8 +54,6 @@ import { Subscription } from 'rxjs';
   providers: [NgbDatepickerConfig]
 })
 
-
-
 export class CartComponent implements OnInit, AfterContentChecked {
   objectKeys = Object.keys;
   orderList = [];
@@ -135,13 +133,10 @@ export class CartComponent implements OnInit, AfterContentChecked {
     calendar: NgbCalendar,
     private modal: NgbModal,
   ) {
-    
-
     this.authServ.currentUser.subscribe(user => {
       this.currentUser = user;
     });
     const currentDate = new Date();
-  
     config.minDate = {
       year: currentDate.getFullYear(),
       month: currentDate.getMonth() + 1,
@@ -252,7 +247,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
       }]
     });
   }
-  
+
   getAdjustedSubtotal(): number {
     return this.marginAmount-this.cartSubTotal;
   }
@@ -384,22 +379,18 @@ export class CartComponent implements OnInit, AfterContentChecked {
 calculateMaxProductsAllowed(): number {
   return this.orderListForDelivery.length || this.orderListForPickUp.length;
 }
-  ngAfterContentChecked() {
-   
+  ngAfterContentChecked() {  
     this.orderListForDelivery = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForDelivery.forEach(el => {
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
-      (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
-      
+      (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;     
     });
-
     this.orderListForPickUp = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForPickUp.forEach(el => {
       (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
     });
-    const maxProductsAllowed = this.calculateMaxProductsAllowed();
-  
+    const maxProductsAllowed = this.calculateMaxProductsAllowed();  
     const selectedIndicesDelivery: number[] = [];
     const selectedIndicesPickup: number[] = [];
 
@@ -438,8 +429,7 @@ calculateMaxProductsAllowed(): number {
           }
         }
       });
-    }
-   
+    }   
   }
  
 
@@ -597,19 +587,15 @@ calculateMaxProductsAllowed(): number {
       !(this.isDeliveryMethodSelected &&
         this.isPickUpMethodSelected)) {
        this.deliveryProductIDs = this.orderListForDelivery
-       .map(el => el.product.id);
-       
+       .map(el => el.product.id);      
     }
 
     if (this.isPickUpMethodSelected &&
       !(this.isDeliveryMethodSelected &&
         this.isPickUpMethodSelected)) {
       this.pickUpProductIDs = this.orderListForPickUp
-      .map(el => el.product.id);
-      
-    }
-
-      
+      .map(el => el.product.id);    
+    }    
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
 
@@ -748,24 +734,19 @@ calculateMaxProductsAllowed(): number {
 
 
   onCheckDelivery = (product) => {
-   
-
     if (this.deliveryProductIDs.indexOf(product.id) === -1) {
       this.deliveryProductIDs.push(product.id);
     } else {
       this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id),1);
-    }
-  
+    }  
   }
 
-  onCheckPickUp = (product) => {
-    
+  onCheckPickUp = (product) => { 
     if (this.pickUpProductIDs.indexOf(product.id) === -1) {
       this.pickUpProductIDs.push(product.id);
     } else {
       this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id),1);
     }
-  
   }
 
   validateAllFormFields(formGroup: FormGroup) {
