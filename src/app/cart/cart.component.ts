@@ -320,13 +320,13 @@ export class CartComponent implements OnInit, AfterContentChecked {
           }
         })
       })
-     
-      const newCartSubTotal = cart.data.subtotal;
-      if (this.cartSubTotal !== newCartSubTotal) {
-        this.cartSubTotal = newCartSubTotal;
+      const newCartgst = cart.data.GST;
+      if (this.cartGST !== newCartgst) {
+        this.cartGST = newCartgst;
+        this.cartSubTotal = cart.data.subtotal;
         this.offers();
       }
-      this.cartGST = cart.data.GST;
+      
       this.cartDeliveryCharges = cart.data.delivery;
       this.pickUpLocations = cart.data.location;
       this.cartDiscount=(this.cartSubTotal*this.lastDiscountPercentage)/100;
