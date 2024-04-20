@@ -61,7 +61,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   cartDiscount: number;
   cartGST: string;
   cartDeliveryCharges: string;
-  cartTotal: number;a
+  cartTotal: number;
   pickUpLocations = [];
   pickUpLocationAddress = '';
   pickUpLocationContact = '';
@@ -641,8 +641,12 @@ export class CartComponent implements OnInit, AfterContentChecked {
   onPlaceOrder() {
     this.loading = true;
     this.isCartSubmitDisabled = true;
-  
-    this.$apiSer.post(`${this.cartAPI}/placeorder`, this.cartForm.value)
+    const requestBody = {
+      ...this.cartForm.value,
+      cartTotal: this.cartTotal,
+      cartDiscount:this.cartDiscount  
+  };
+    this.$apiSer.post(`${this.cartAPI}/placeorder`, requestBody)
         .subscribe(res => {
             if (res.success) {
                 this.toastr.success(`${res.message} Please add order reference number.`);
