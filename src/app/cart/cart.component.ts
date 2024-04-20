@@ -3,7 +3,9 @@ import {
   Input,
   OnInit,
   AfterContentChecked,
-  ViewChild
+  ViewChild,
+  QueryList,
+  ViewChildren
 } from '@angular/core';
 
 import {
@@ -132,7 +134,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
       this.currentUser = user;
     });
     const currentDate = new Date();
-
+  
     config.minDate = {
       year: currentDate.getFullYear(),
       month: currentDate.getMonth() + 1,
@@ -371,11 +373,14 @@ export class CartComponent implements OnInit, AfterContentChecked {
     } catch (error) { }
   }
 
+
   ngAfterContentChecked() {
+   
     this.orderListForDelivery = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForDelivery.forEach(el => {
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
       (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
+      
     });
 
     this.orderListForPickUp = JSON.parse(JSON.stringify(this.orderList));
@@ -383,6 +388,8 @@ export class CartComponent implements OnInit, AfterContentChecked {
       (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
     });
+  
+
   }
 
   updateDeliveryDate(){
@@ -542,19 +549,43 @@ export class CartComponent implements OnInit, AfterContentChecked {
     }
 
     if (this.isPickUpMethodSelected &&
-        !(this.isDeliveryMethodSelected &&
-            this.isPickUpMethodSelected)) {
-        this.pickUpProductIDs = this.orderListForPickUp.map(el => el.product.id);
+      !(this.isDeliveryMethodSelected &&
+        this.isPickUpMethodSelected)) {
+      this.pickUpProductIDs = this.orderListForPickUp
+      .map(el => el.product.id);
+      
     }
 
+    if(this.isDeliveryMethodSelected &&this.isPickUpMethodSelected){
+    
+      if(this.isDeliveryMethodSelected){
+        this.deliveryProductIDs = this.orderListForDelivery
+        .filter(el => el.product.selected)
+        .map(el => el.product.id);  
+      }
+      else if(this.isPickUpMethodSelected){
+        this.pickUpProductIDs = this.orderListForPickUp
+        .filter(el => el.product.selected)
+        .map(el => el.product.id); 
+      }
+      else{
+        this.deliveryProductIDs = this.orderListForDelivery
+        .filter(el => el.product.selected)
+        .map(el => el.product.id);    
+        this.pickUpProductIDs = this.orderListForPickUp
+        .filter(el => el.product.selected)
+        .map(el => el.product.id); 
+      }
+    }
+    
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
-
+    
     if (this.cartForm.invalid ||
-        (this.orderList.length !==
-            (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
-        this.validateAllFormFields(this.cartForm);
-        return;
+      !(this.orderList.length <=
+        (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
+      this.validateAllFormFields(this.cartForm);
+      return;
     }
    
     
@@ -667,19 +698,23 @@ export class CartComponent implements OnInit, AfterContentChecked {
   }
 
   onCheckDelivery = (product) => {
+
     if (this.deliveryProductIDs.indexOf(product.id) === -1) {
       this.deliveryProductIDs.push(product.id);
     } else {
       this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id));
     }
+  
   }
 
   onCheckPickUp = (product) => {
+
     if (this.pickUpProductIDs.indexOf(product.id) === -1) {
       this.pickUpProductIDs.push(product.id);
     } else {
       this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id));
     }
+  
   }
 
   validateAllFormFields(formGroup: FormGroup) {
@@ -694,6 +729,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   }
 
   confirmOrder() {
+  
     this.$apiSer.get(`${this.cartAPI}/placeorder`).subscribe(res => {
       if (res.success) {
         this.orderPlaced = true;
