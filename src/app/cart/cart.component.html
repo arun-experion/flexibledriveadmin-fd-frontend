@@ -225,17 +225,12 @@
                       *ngIf="isPickUpMethodSelected === true">
                       <p class="small font-weight-bold text-dark">Select items to be delivered</p>
                       <ul class="list-unstyled payment-options">
-
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForDelivery">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
-                            #deliveryCheck
-                           
-                              [checked]="order.product.selected"
+                              [checked]="order.product.selected"                            
                               (change)="onCheckDelivery(order.product);"
-                              [disabled]="order.product.disabled"
-                              
-                              >
+                              [disabled]="order.product.disabled">                              
                             <label class="custom-control-label" for="delivery_{{order.product.product_nr}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -372,14 +367,11 @@
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForPickUp; let i = index;">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" name="pickUp_{{order.product.id}}" id="pickUp_{{order.product.id}}"
-                            #pickUpCheck
-                              class="custom-control-input" 
-                             
+                              class="custom-control-input"                             
                               [checked]="order.product.selected"
                               (change)="onCheckPickUp(order.product)"
-                              [disabled]="order.product.disabled"
-                              
-                              >
+                              [disabled]="order.product.disabled"                             
+                              >                            
                             <label class="custom-control-label" for="pickUp_{{order.product.id}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -405,7 +397,7 @@
                         <label for="pickup.first_name">First Name</label>
                         <div class="input-animate">
                           <input type="text" class="form-control" tabindex="11" formControlName="first_name"
-                            id="pickup.first_name" >
+                            id="pickup.first_name" />
                           <span class="focus-border"><i></i></span>
                         </div>
                         <control-messages *ngIf="isCartFormSubmited && pickUpForm.controls.first_name.errors"

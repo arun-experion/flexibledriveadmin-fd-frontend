@@ -3,9 +3,7 @@ import {
   Input,
   OnInit,
   AfterContentChecked,
-  ViewChild,
-  QueryList,
-  ViewChildren
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -90,7 +88,9 @@ export class CartComponent implements OnInit, AfterContentChecked {
   isSameDayOrder = false;
   postNineThrityDelivery = false;
   pickupTimeError = "";
-
+  selectedDeliveryIndices: number[] = [];
+  selectedPickupIndices: number[] = [];
+  selectedIndices: number[] = [];
 
   @Input() showCartDeliveryForm: boolean;
   @Input() showCartPickupForm: boolean;
@@ -134,7 +134,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
       this.currentUser = user;
     });
     const currentDate = new Date();
-  
     config.minDate = {
       year: currentDate.getFullYear(),
       month: currentDate.getMonth() + 1,
@@ -245,11 +244,10 @@ export class CartComponent implements OnInit, AfterContentChecked {
       }]
     });
   }
-  
+
   getAdjustedSubtotal(): number {
     return this.marginAmount-this.cartSubTotal;
   }
-
   ngOnInit() {
     this.offers();
     this.showPrice.setPriceChangeDisabled(false);
@@ -373,25 +371,57 @@ export class CartComponent implements OnInit, AfterContentChecked {
     } catch (error) { }
   }
 
-
-  ngAfterContentChecked() {
-   
+calculateMaxProductsAllowed(): number {
+  return this.orderListForDelivery.length || this.orderListForPickUp.length;
+}
+  ngAfterContentChecked() {  
     this.orderListForDelivery = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForDelivery.forEach(el => {
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
-      (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
-      
+      (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;     
     });
-
     this.orderListForPickUp = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForPickUp.forEach(el => {
       (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
     });
+    const maxProductsAllowed = this.calculateMaxProductsAllowed();  
+    const selectedIndicesDelivery: number[] = [];
+    const selectedIndicesPickup: number[] = [];
+
+    this.orderListForDelivery.forEach((order, index) => {
+      if (this.deliveryProductIDs.indexOf(order.product.id) !== -1) {
+        selectedIndicesDelivery.push(index);
+      }
+    });
   
+    this.orderListForPickUp.forEach((order, index) => {
+      if (this.pickUpProductIDs.indexOf(order.product.id) !== -1) {
+        selectedIndicesPickup.push(index); 
+      }
+    });
 
+    if (selectedIndicesDelivery.length > 0) {
+      this.orderListForDelivery.forEach((order) => {
+        if (this.deliveryProductIDs.indexOf(order.product.id) === -1 && !order.product.disabled) {
+          if (selectedIndicesDelivery.length === maxProductsAllowed - 1) {
+            order.product.disabled = true;
+          }         
+        }      
+      });
+    }
+  
+    if (selectedIndicesPickup.length > 0) {
+      this.orderListForPickUp.forEach((order) => {
+        if (this.pickUpProductIDs.indexOf(order.product.id) === -1 && !order.product.disabled) {
+          if (selectedIndicesPickup.length === maxProductsAllowed - 1) {
+            order.product.disabled = true;
+          }
+        }
+      });
+    }   
   }
-
+ 
   updateDeliveryDate(){
     let withinHomeState = false;
 
@@ -543,41 +573,18 @@ export class CartComponent implements OnInit, AfterContentChecked {
     this.isCartFormSubmited = true;
 
     if (this.isDeliveryMethodSelected &&
-        !(this.isDeliveryMethodSelected &&
-            this.isPickUpMethodSelected)) {
-        this.deliveryProductIDs = this.orderListForDelivery.map(el => el.product.id);
+      !(this.isDeliveryMethodSelected &&
+        this.isPickUpMethodSelected)) {
+       this.deliveryProductIDs = this.orderListForDelivery
+       .map(el => el.product.id);      
     }
 
     if (this.isPickUpMethodSelected &&
       !(this.isDeliveryMethodSelected &&
         this.isPickUpMethodSelected)) {
       this.pickUpProductIDs = this.orderListForPickUp
-      .map(el => el.product.id);
-      
-    }
-
-    if(this.isDeliveryMethodSelected &&this.isPickUpMethodSelected){
-    
-      if(this.isDeliveryMethodSelected){
-        this.deliveryProductIDs = this.orderListForDelivery
-        .filter(el => el.product.selected)
-        .map(el => el.product.id);  
-      }
-      else if(this.isPickUpMethodSelected){
-        this.pickUpProductIDs = this.orderListForPickUp
-        .filter(el => el.product.selected)
-        .map(el => el.product.id); 
-      }
-      else{
-        this.deliveryProductIDs = this.orderListForDelivery
-        .filter(el => el.product.selected)
-        .map(el => el.product.id);    
-        this.pickUpProductIDs = this.orderListForPickUp
-        .filter(el => el.product.selected)
-        .map(el => el.product.id); 
-      }
-    }
-    
+      .map(el => el.product.id);    
+    }    
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
     
@@ -587,8 +594,17 @@ export class CartComponent implements OnInit, AfterContentChecked {
       this.validateAllFormFields(this.cartForm);
       return;
     }
-   
-    
+
+  if (this.isDeliveryMethodSelected && this.deliveryProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for delivery.');
+    return;
+  }
+
+  if (this.isPickUpMethodSelected && this.pickUpProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for pick up.');
+    return;
+  }
+
     try {
         // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
         const { year, month, day } = this.pickUpForm.controls.date.value;
@@ -602,8 +618,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
     }
     else{
       this.onPlaceOrder();
-    }
-    
+    }  
   }
 
   offers() {
@@ -698,23 +713,19 @@ export class CartComponent implements OnInit, AfterContentChecked {
   }
 
   onCheckDelivery = (product) => {
-
     if (this.deliveryProductIDs.indexOf(product.id) === -1) {
       this.deliveryProductIDs.push(product.id);
     } else {
-      this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id));
-    }
-  
+      this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id),1);
+    }  
   }
 
-  onCheckPickUp = (product) => {
-
+  onCheckPickUp = (product) => { 
     if (this.pickUpProductIDs.indexOf(product.id) === -1) {
       this.pickUpProductIDs.push(product.id);
     } else {
-      this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id));
+      this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id),1);
     }
-  
   }
 
   validateAllFormFields(formGroup: FormGroup) {
@@ -728,8 +739,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
     });
   }
 
-  confirmOrder() {
-  
+  confirmOrder() { 
     this.$apiSer.get(`${this.cartAPI}/placeorder`).subscribe(res => {
       if (res.success) {
         this.orderPlaced = true;
