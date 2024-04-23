@@ -12,7 +12,8 @@ import {
 
 import {
   CARTAPI,
-  TOASTRTIMEOUT
+  TOASTRTIMEOUT,
+  OFFERAPI
 } from '../constant';
 
 import {
@@ -41,7 +42,8 @@ import { AuthenticationService } from '../services/authentication.service';
 import { ShowPriceService } from '../services/show-price.service';
 
 import { NgbDatepickerConfig, NgbCalendar, NgbDate, NgbDateParserFormatter, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { LocalStorageService } from '../local-storage.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
@@ -52,10 +54,14 @@ import { NgbDatepickerConfig, NgbCalendar, NgbDate, NgbDateParserFormatter, NgbM
 export class CartComponent implements OnInit, AfterContentChecked {
   objectKeys = Object.keys;
   orderList = [];
-  cartSubTotal: string;
+  marginAmount: number;
+  discountPercentage: number;
+  lastDiscountPercentage:number;
+  cartSubTotal: number;
+  cartDiscount: number;
   cartGST: string;
   cartDeliveryCharges: string;
-  cartTotal: string;
+  cartTotal: number;
   pickUpLocations = [];
   pickUpLocationAddress = '';
   pickUpLocationContact = '';
@@ -82,12 +88,17 @@ export class CartComponent implements OnInit, AfterContentChecked {
   isSameDayOrder = false;
   postNineThrityDelivery = false;
   pickupTimeError = "";
+  selectedDeliveryIndices: number[] = [];
+  selectedPickupIndices: number[] = [];
+  selectedIndices: number[] = [];
 
   @Input() showCartDeliveryForm: boolean;
   @Input() showCartPickupForm: boolean;
   @Input() showCartPickupDeliveryForm: boolean;
 
   @ViewChild('cartBackOrderModal', { static: false }) cartBackOrderModal;
+  @ViewChild('cartconfirmpopup', { static: false }) cartconfirmpopup;
+
   carBackOrderPart: any;
 
   isDeliveryMethodSelected = true;
@@ -96,7 +107,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
   productFromUserState = 0;
   productAvailableLocations = [];
   productInterStateAvailable = 0;
-
+  private Offer=OFFERAPI;
   private cartAPI = CARTAPI;
   private state = {
     "QLD": "Queensland Branch",
@@ -117,13 +128,12 @@ export class CartComponent implements OnInit, AfterContentChecked {
     private showPrice: ShowPriceService,
     config: NgbDatepickerConfig,
     calendar: NgbCalendar,
-    private modal: NgbModal
+    private modal: NgbModal,
   ) {
     this.authServ.currentUser.subscribe(user => {
       this.currentUser = user;
     });
     const currentDate = new Date();
-
     config.minDate = {
       year: currentDate.getFullYear(),
       month: currentDate.getMonth() + 1,
@@ -235,7 +245,11 @@ export class CartComponent implements OnInit, AfterContentChecked {
     });
   }
 
+  getAdjustedSubtotal(): number {
+    return this.marginAmount-this.cartSubTotal;
+  }
   ngOnInit() {
+    this.offers();
     this.showPrice.setPriceChangeDisabled(false);
     this.showPrice.isPriceVisible.subscribe(res => {
       this.isPriceVisible = res;
@@ -306,12 +320,17 @@ export class CartComponent implements OnInit, AfterContentChecked {
           }
         })
       })
-
-      this.cartSubTotal = cart.data.subtotal;
-      this.cartGST = cart.data.GST;
+      const newCartgst = cart.data.GST;
+      if (this.cartGST !== newCartgst) {
+        this.cartGST = newCartgst;
+        this.cartSubTotal = cart.data.subtotal;
+        this.offers();
+      }
+      
       this.cartDeliveryCharges = cart.data.delivery;
-      this.cartTotal = cart.data.total;
       this.pickUpLocations = cart.data.location;
+      this.cartDiscount=(this.cartSubTotal*this.lastDiscountPercentage)/100;
+      this.cartTotal = cart.data.total-this.cartDiscount;
     });
 
     /**
@@ -352,20 +371,57 @@ export class CartComponent implements OnInit, AfterContentChecked {
     } catch (error) { }
   }
 
-  ngAfterContentChecked() {
+calculateMaxProductsAllowed(): number {
+  return this.orderListForDelivery.length || this.orderListForPickUp.length;
+}
+  ngAfterContentChecked() {  
     this.orderListForDelivery = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForDelivery.forEach(el => {
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
-      (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
+      (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;     
     });
-
     this.orderListForPickUp = JSON.parse(JSON.stringify(this.orderList));
     this.orderListForPickUp.forEach(el => {
       (this.deliveryProductIDs.indexOf(el.product.id) !== -1) ? el.product.disabled = true : el.product.disabled = false;
       (this.pickUpProductIDs.indexOf(el.product.id) !== -1) ? el.product.selected = true : el.product.selected = false;
     });
-  }
+    const maxProductsAllowed = this.calculateMaxProductsAllowed();  
+    const selectedIndicesDelivery: number[] = [];
+    const selectedIndicesPickup: number[] = [];
 
+    this.orderListForDelivery.forEach((order, index) => {
+      if (this.deliveryProductIDs.indexOf(order.product.id) !== -1) {
+        selectedIndicesDelivery.push(index);
+      }
+    });
+  
+    this.orderListForPickUp.forEach((order, index) => {
+      if (this.pickUpProductIDs.indexOf(order.product.id) !== -1) {
+        selectedIndicesPickup.push(index); 
+      }
+    });
+
+    if (selectedIndicesDelivery.length > 0) {
+      this.orderListForDelivery.forEach((order) => {
+        if (this.deliveryProductIDs.indexOf(order.product.id) === -1 && !order.product.disabled) {
+          if (selectedIndicesDelivery.length === maxProductsAllowed - 1) {
+            order.product.disabled = true;
+          }         
+        }      
+      });
+    }
+  
+    if (selectedIndicesPickup.length > 0) {
+      this.orderListForPickUp.forEach((order) => {
+        if (this.pickUpProductIDs.indexOf(order.product.id) === -1 && !order.product.disabled) {
+          if (selectedIndicesPickup.length === maxProductsAllowed - 1) {
+            order.product.disabled = true;
+          }
+        }
+      });
+    }   
+  }
+ 
   updateDeliveryDate(){
     let withinHomeState = false;
 
@@ -519,66 +575,152 @@ export class CartComponent implements OnInit, AfterContentChecked {
     if (this.isDeliveryMethodSelected &&
       !(this.isDeliveryMethodSelected &&
         this.isPickUpMethodSelected)) {
-      this.deliveryProductIDs = this.orderListForDelivery.map(el => el.product.id);
+       this.deliveryProductIDs = this.orderListForDelivery
+       .map(el => el.product.id);      
     }
 
     if (this.isPickUpMethodSelected &&
       !(this.isDeliveryMethodSelected &&
         this.isPickUpMethodSelected)) {
-      this.pickUpProductIDs = this.orderListForPickUp.map(el => el.product.id);
-    }
-
+      this.pickUpProductIDs = this.orderListForPickUp
+      .map(el => el.product.id);    
+    }    
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
-
+    
     if (this.cartForm.invalid ||
-      (this.orderList.length !==
+      !(this.orderList.length <=
         (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
       this.validateAllFormFields(this.cartForm);
       return;
     }
 
-    try {
-      // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
-      const { year, month, day } = this.pickUpForm.controls.date.value;
-      this.cartForm.value.pickup.date = `${year}-${month}-${day}`;
-    } catch (error) { }
+  if (this.isDeliveryMethodSelected && this.deliveryProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for delivery.');
+    return;
+  }
 
+  if (this.isPickUpMethodSelected && this.pickUpProductIDs.length === 0) {
+    this.toastr.error('At least one item must be selected for pick up.');
+    return;
+  }
+
+    try {
+        // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
+        const { year, month, day } = this.pickUpForm.controls.date.value;
+        this.cartForm.value.pickup.date = `${year}-${month}-${day}`;
+    } catch (error) { }
+    if(this.getAdjustedSubtotal()>0){
+      this.modal.open(this.cartconfirmpopup, {
+        backdrop: 'static',
+        keyboard: false
+      });
+    }
+    else{
+      this.onPlaceOrder();
+    }  
+  }
+
+  offers() {
+    const offerKey = 'cached_offers';
+    const cachedOffers = localStorage.getItem(offerKey);
+    if (cachedOffers) {
+      
+        const discountoffer = JSON.parse(cachedOffers).filter(offer => offer.margin_amount > this.cartSubTotal);
+        const lastdiscountoffer = JSON.parse(cachedOffers).filter(offer => offer.margin_amount < this.cartSubTotal);
+        if (discountoffer.length > 0) {
+
+            this.marginAmount = discountoffer[0].margin_amount;
+            this.discountPercentage = discountoffer[0].discount_percentage;
+
+            if(lastdiscountoffer.length>0){
+              this.lastDiscountPercentage = lastdiscountoffer[lastdiscountoffer.length - 1].discount_percentage;
+            }
+            else{
+              this.lastDiscountPercentage = 0;
+            }
+           
+        } else {
+          const cachedOfferArray = JSON.parse(cachedOffers);
+          if (cachedOfferArray.length > 0) {
+              this.lastDiscountPercentage = cachedOfferArray[cachedOfferArray.length - 1].discount_percentage;
+          }
+          else{
+            this.lastDiscountPercentage = 0;
+          }
+        }
+    } else {
+        this.$apiSer.get(`${this.Offer}`).subscribe(
+            res => {
+                if (res.success) {
+                    const discountoffer = res.data.filter(offer => offer.margin_amount > this.cartSubTotal);
+                    const lastdiscountoffer = res.data.filter(offer => offer.margin_amount < this.cartSubTotal);
+                    if (discountoffer.length > 0) {
+                        this.marginAmount = discountoffer[0].margin_amount;
+                        this.discountPercentage = discountoffer[0].discount_percentage;
+                        if(lastdiscountoffer.length>0){
+                          this.lastDiscountPercentage = lastdiscountoffer[lastdiscountoffer.length - 1].discount_percentage;
+                        }
+                        else{
+                          this.lastDiscountPercentage = 0;
+                        }
+                    }
+                   else {
+                    const offersArray = res.data;
+                    if (offersArray.length > 0) {
+                        this.lastDiscountPercentage = offersArray[offersArray.length - 1].discount_percentage;
+                    }
+                    else{
+                      this.lastDiscountPercentage = 0;
+                    }
+                    }
+                    localStorage.setItem(offerKey, JSON.stringify(res.data));
+                }
+            },
+            error => {
+                console.error('Error:', error);
+            }
+        );
+    }
+}
+
+  onPlaceOrder() {
     this.loading = true;
     this.isCartSubmitDisabled = true;
-
-    this.$apiSer.post(
-      `${this.cartAPI}/placeorder`,
-      this.cartForm.value
-    ).subscribe(res => {
-      if (res.success) {
-        this.toastr.success(`${res.message} Please add order reference number.`);
-        this.isOrderPlaced = true;
-        this.order = res.data;
-        sessionStorage.removeItem('reOrder');
-      } else {
-        this.isOrderPlaceFailed = true;
-        this.messages = res.data;
-      }
-    }, error => console.log(error), () => {
-      this.loading = false;
-      this.isCartSubmitDisabled = true;
-    });
+  
+    this.$apiSer.post(`${this.cartAPI}/placeorder`, this.cartForm.value)
+        .subscribe(res => {
+            if (res.success) {
+                this.toastr.success(`${res.message} Please add order reference number.`);
+                this.isOrderPlaced = true;
+                this.order = res.data;
+                sessionStorage.removeItem('reOrder');
+            } else {
+                this.isOrderPlaceFailed = true;
+                this.messages = res.data;
+            }
+        }, error => {
+            console.log(error);
+        }, () => {
+            this.loading = false;
+            this.isCartSubmitDisabled = true;
+            
+        });
   }
 
   onCheckDelivery = (product) => {
     if (this.deliveryProductIDs.indexOf(product.id) === -1) {
       this.deliveryProductIDs.push(product.id);
     } else {
-      this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id));
-    }
+      this.deliveryProductIDs.splice(this.deliveryProductIDs.indexOf(product.id),1);
+    }  
   }
 
-  onCheckPickUp = (product) => {
+  onCheckPickUp = (product) => { 
     if (this.pickUpProductIDs.indexOf(product.id) === -1) {
       this.pickUpProductIDs.push(product.id);
     } else {
-      this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id));
+      this.pickUpProductIDs.splice(this.pickUpProductIDs.indexOf(product.id),1);
     }
   }
 
@@ -593,7 +735,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
     });
   }
 
-  confirmOrder() {
+  confirmOrder() { 
     this.$apiSer.get(`${this.cartAPI}/placeorder`).subscribe(res => {
       if (res.success) {
         this.orderPlaced = true;
@@ -663,7 +805,6 @@ export class CartComponent implements OnInit, AfterContentChecked {
         });
       }
     }
-
   }
 
   decreseQuantityInCart(product) {

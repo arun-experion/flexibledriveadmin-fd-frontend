@@ -31,7 +31,7 @@ export const SESSIONSTORAGECOMPARELISTIDS = `compareListIDs`;
 export const BULKCARTADDAPI = `${CARTAPI}/add/bulk/product`;
 export const USERISACTIVEAPI = `/user-is-active`;
 export const COMPAREOVERLAYTIMEOUT = 1000;
-
+export const OFFERAPI=`/offers`;
 export const SWIPERCONFIGINTERFACE = {
     direction: 'horizontal',
     slidesPerView: 4,

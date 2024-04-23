@@ -162,6 +162,10 @@
                     <div class="col">GST</div>
                     <div class="col text-right">{{cartGST | currency: 'USD': 'symbol': '1.2-2'}}</div>
                   </li>
+                  <li class="row">
+                    <div class="col">Discount</div>
+                    <div class="col text-right">{{cartDiscount| currency: 'USD': 'symbol': '1.2-2'}}</div>
+                  </li>
                   <li class="divider my-3 border-bottom"></li>
                   <li class="row font-weight-bold">
                     <div class="col">Total</div>
@@ -221,13 +225,12 @@
                       *ngIf="isPickUpMethodSelected === true">
                       <p class="small font-weight-bold text-dark">Select items to be delivered</p>
                       <ul class="list-unstyled payment-options">
-
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForDelivery">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" id="delivery_{{order.product.product_nr}}" class="custom-control-input"
-                              [checked]="order.product.selected"
-                              (change)="order.product.selected = !order.product.selected; onCheckDelivery(order.product);"
-                              [disabled]="order.product.disabled">
+                              [checked]="order.product.selected"                            
+                              (change)="onCheckDelivery(order.product);"
+                              [disabled]="order.product.disabled">                              
                             <label class="custom-control-label" for="delivery_{{order.product.product_nr}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -248,7 +251,7 @@
                           [control]="deliveryForm.get('products')"></control-messages>
                       </ul>
                     </div>
-                    <div class="row col-sm-8 col-12" formGroupName="delivery">
+                    <div class="row col-sm-8 col-12" formGroupName="delivery" >
                       <div class="form-group col-md-6 col-6">
                         <label for="delivery.first_name">First Name</label>
                         <div class="input-animate">
@@ -364,8 +367,11 @@
                         <li class="mb-3 overflow-hidden" *ngFor="let order of orderListForPickUp; let i = index;">
                           <div class="custom-control custom-checkbox compare-checkbox order-checkbox">
                             <input type="checkbox" name="pickUp_{{order.product.id}}" id="pickUp_{{order.product.id}}"
-                              class="custom-control-input" [checked]="order.product.selected" (change)="onCheckPickUp(order.product)"
-                              [disabled]="order.product.disabled">
+                              class="custom-control-input"                             
+                              [checked]="order.product.selected"
+                              (change)="onCheckPickUp(order.product)"
+                              [disabled]="order.product.disabled"                             
+                              >                            
                             <label class="custom-control-label" for="pickUp_{{order.product.id}}">
                               <div class="d-flex flex-row align-items-center order-info" style="padding-left: 30xp;">
                                 <div style="height: 45px; width: 45px;" class="border">
@@ -443,6 +449,7 @@
                             </div>
                           </li>
                         </ul>
+                        <span *ngIf="!pickUpForm.controls.location.valid && pickUpForm.controls.location.touched" class="text-danger">Please select a pick-up location.</span>
                       </div>
                       <div class="form-group col-md-12 col-12">
                         <label for="pickup.date">Pick-up & Time</label>
@@ -481,7 +488,7 @@
                 </div>
                 <div class="col-md-12 col-12 confirm-btn my-5">
                   <div class="form-group"
-                    *ngIf="!(orderList.length === (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
+                    *ngIf="!(orderList.length <= (pickUpProductIDs.length + deliveryProductIDs.length)) && isCartFormSubmited">
                     <ul class="invalid-feedback" style="display: block;">
                       <li>
                         Need to select all products according to delivery method you want to select.
@@ -494,11 +501,11 @@
                       <li>{{messages[key]}}</li>
                     </ul>
                   </div>
-
                   <button type="submit" class="btn btn-primary btn-long" data-toggle="modal"
                     data-target="#confirmationpopup" tabindex="16" [disabled]="isCartSubmitDisabled">Confirm</button>
                   <img class="mr-3" *ngIf="loading"
-                    src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                    src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==">
+        
                 </div>
               </form>
             </div>
@@ -527,3 +534,30 @@
     <button type="button" class="btn btn-primary" (click)="addAsABackOrder()">Back Order</button>
   </div>
 </ng-template>
+
+  <ng-template #cartconfirmpopup let-c="close" let-d="dismiss">
+    <div class="modal-header border-0 pb-0">
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismissAll()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body col-sm-8 col-12 text-center mx-auto">
+      <ng-container *ngIf="getAdjustedSubtotal() >=0;">
+        <p class="h5">Order for</p>
+        <p><span class="h4 text-dark font-weight-bold">{{ getAdjustedSubtotal() | currency: 'USD': 'symbol': '1.2-2' }}</span>  more</p>
+        <p> to get <span class="h4 text-dark font-weight-bold">{{ discountPercentage }}%</span> discount</p>
+      </ng-container>
+  
+      <div class="row">
+        <div class="col-6 mb-3">
+          <button type="button" class="btn btn-secondary btn-block" (click)="modal.dismissAll()">Cancel</button>
+        </div>
+        <div class="col-6 mb-3">
+          <button type="submit" class="btn btn-primary btn-long" data-toggle="modal" [disabled]="isCartSubmitDisabled" (click)="onPlaceOrder()">Order</button>
+          <img class="mr-3" *ngIf="loading"
+            src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==">
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  
