@@ -150,7 +150,9 @@ export class CartComponent implements OnInit, AfterContentChecked {
         validators: [
           Validators.required
         ],
-      }]
+      }],
+      cartTotal: [0],
+      cartDiscount: [0]
     });
 
     this.pickUpForm = this.fb.group({
@@ -687,7 +689,10 @@ calculateMaxProductsAllowed(): number {
   onPlaceOrder() {
     this.loading = true;
     this.isCartSubmitDisabled = true;
-  
+    this.cartForm.patchValue({
+      cartTotal: this.cartTotal,
+      cartDiscount: this.cartDiscount
+    });
     this.$apiSer.post(`${this.cartAPI}/placeorder`, this.cartForm.value)
         .subscribe(res => {
             if (res.success) {
