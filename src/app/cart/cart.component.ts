@@ -589,7 +589,15 @@ calculateMaxProductsAllowed(): number {
     }    
     this.deliveryForm.controls.products.setValue(this.deliveryProductIDs);
     this.pickUpForm.controls.products.setValue(this.pickUpProductIDs);
-    
+    if (this.isDeliveryMethodSelected && this.deliveryProductIDs.length === 0) {
+      this.toastr.error('At least one item must be selected for delivery.');
+      return;
+    }
+  
+    if (this.isPickUpMethodSelected && this.pickUpProductIDs.length === 0) {
+      this.toastr.error('At least one item must be selected for pick up.');
+      return;
+    }
     if (this.cartForm.invalid ||
       !(this.orderList.length <=
         (this.pickUpProductIDs.length + this.deliveryProductIDs.length))) {
@@ -597,15 +605,7 @@ calculateMaxProductsAllowed(): number {
       return;
     }
 
-  if (this.isDeliveryMethodSelected && this.deliveryProductIDs.length === 0) {
-    this.toastr.error('At least one item must be selected for delivery.');
-    return;
-  }
 
-  if (this.isPickUpMethodSelected && this.pickUpProductIDs.length === 0) {
-    this.toastr.error('At least one item must be selected for pick up.');
-    return;
-  }
 
     try {
         // const date = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'];
