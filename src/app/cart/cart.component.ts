@@ -331,7 +331,7 @@ export class CartComponent implements OnInit, AfterContentChecked {
       
       this.cartDeliveryCharges = cart.data.delivery;
       this.pickUpLocations = cart.data.location;
-      this.cartDiscount=(this.cartSubTotal*this.lastDiscountPercentage)/100;
+      this.cartDiscount=this.lastDiscountPercentage;
       this.cartTotal = cart.data.total-this.cartDiscount;
     });
 
